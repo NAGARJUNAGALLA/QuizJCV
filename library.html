@@ -26,6 +26,7 @@ body {
   background: #fff;
   border-radius: 12px;
   margin: 12px;
+  padding: 0;
   overflow: hidden;
   box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
@@ -37,7 +38,6 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: pointer;
 }
 
 .subject-title span {
@@ -51,38 +51,32 @@ body {
   background: #fdfdfd;
 }
 
-.quiz-row {
+.quiz-item {
   background: #fff;
   padding: 12px 15px;
   border-radius: 10px;
   margin-bottom: 10px;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
 }
 
-.quiz-info {
-  font-size: 16px;
+.quiz-item:hover {
+  background: #f0f0f0;
+  cursor: pointer;
 }
 
-.attempt-btn {
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: dodgerblue;
-  color: white;
-  border: none;
-  font-size: 14px;
+.arrow {
+  transition: 0.3s;
 }
 
-.score-text {
-  font-size: 14px;
-  color: green;
-  margin-left: 6px;
+.rotate {
+  transform: rotate(180deg);
 }
 
-.rotate { transform: rotate(180deg); }
-
+/* Bottom Navigation */
 .navbar {
   position: fixed;
   bottom: 0;
@@ -98,10 +92,15 @@ body {
 .nav-item {
   text-align: center;
   font-size: 12px;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  opacity: 0.7;
 }
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="header">📚 Library</div>
@@ -110,15 +109,15 @@ body {
 
 <!-- Bottom Navigation -->
 <div class="navbar">
-  <div class="nav-item" onclick="location.href='dashboard.html'">🏠<br>Home</div>
-  <div class="nav-item">📘<br>Library</div>
+  <div class="nav-item" onclick="goHome()">🏠<br>Home</div>
+  <div class="nav-item" onclick="goLibrary()">📘<br>Library</div>
   <div class="nav-item">📝<br>Exams</div>
-  <div class="nav-item">🖥️<br>Online Exams</div>
+  <div class="nav-item">🖥️<br>Online</div>
   <div class="nav-item">💳<br>Fee</div>
 </div>
 
 <script>
-/* SUBJECT + QUIZ DATA */
+// SUBJECTS & QUIZZES
 const data = [
   {
     subject: "Telugu",
@@ -126,7 +125,8 @@ const data = [
     lessons: 7,
     quizzes: [
       { title: "అమ్మఓడి", id: "ammaodi" },
-      { title: "తప్పి", id: "thappi" }
+      { title: "తప్పి", id: "thappi" },
+      { title: "మార్కొడ్డి తెల్ల దొరతనం", id: "markodi" }
     ]
   },
   {
@@ -134,15 +134,33 @@ const data = [
     color: "#00695C",
     lessons: 12,
     quizzes: [
-      { title: "Nouns", id: "MathsProbability" },
+      { title: "Nouns", id: "nouns" },
       { title: "Tenses", id: "tenses" }
+    ]
+  },
+  {
+    subject: "Hindi",
+    color: "#3949AB",
+    lessons: 6,
+    quizzes: [
+      { title: "Varnamala", id: "varnamala" },
+      { title: "Sandhi", id: "sandhi" }
+    ]
+  },
+  {
+    subject: "Mathematics",
+    color: "#6A1B9A",
+    lessons: 10,
+    quizzes: [
+      { title: "Probability", id: "MathsProbability" },
+      { title: "Linear Equations", id: "lineareq" }
     ]
   }
 ];
 
-/* LOAD SUBJECTS */
 const container = document.getElementById("subjectContainer");
 
+// Render Subjects
 data.forEach((sub, index) => {
   const card = document.createElement("div");
   card.className = "subject-card";
@@ -150,48 +168,43 @@ data.forEach((sub, index) => {
   card.innerHTML = `
     <div class="subject-title" style="background:${sub.color}" onclick="toggleSection(${index})">
       <div>${sub.subject}<br><span>${sub.lessons} lessons</span></div>
-      <div id="arrow${index}">⬇️</div>
+      <div class="arrow" id="arrow${index}">⬇️</div>
     </div>
 
     <div class="quiz-list" id="quizList${index}">
+      ${sub.quizzes.map(q =>
+        `<div class='quiz-item' onclick="openQuiz('${q.id}')">${q.title} ➤</div>`
+      ).join('')}
     </div>
   `;
 
   container.appendChild(card);
-
-  // Fill quizzes with score + attempt button
-  const quizList = card.querySelector(`#quizList${index}`);
-
-  sub.quizzes.forEach(q => {
-    const lastScore = localStorage.getItem("score_" + q.id);
-
-    quizList.innerHTML += `
-      <div class="quiz-row">
-        <div class="quiz-info">
-          ${q.title}
-          ${lastScore ? `<span class='score-text'>(Score: ${lastScore}%)</span>` : ""}
-        </div>
-
-        <button class="attempt-btn" onclick="attemptQuiz('${q.id}')">
-          ${lastScore ? "Re-attempt" : "Attempt"}
-        </button>
-      </div>
-    `;
-  });
 });
 
-/* SHOW/HIDE QUIZZES */
+// Show / Hide quiz section
 function toggleSection(i) {
   const list = document.getElementById("quizList" + i);
   const arrow = document.getElementById("arrow" + i);
-  list.style.display = list.style.display === "block" ? "none" : "block";
-  arrow.classList.toggle("rotate");
+
+  if (list.style.display === "block") {
+    list.style.display = "none";
+    arrow.classList.remove("rotate");
+  } else {
+    list.style.display = "block";
+    arrow.classList.add("rotate");
+  }
 }
 
-/* OPEN QUIZ PAGE */
-function attemptQuiz(id) {
+// Open Quiz from /quiz folder
+function openQuiz(id) {
+  // Example: quiz/nouns.html
   window.location.href = "quiz/" + id + ".html";
 }
+
+// Bottom navbar
+function goHome() { window.location.href = "dashboard.html"; }
+function goLibrary() { window.location.href = "library.html"; }
+
 </script>
 
 </body>
