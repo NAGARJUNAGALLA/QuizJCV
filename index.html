@@ -1,322 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Login — JCV Tuition</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stylish Login</title>
+
 <style>
-  :root{
-    --accent: #1976d2;
-    --card-bg: rgba(255,255,255,0.85);
-    --glass: rgba(255,255,255,0.12);
-  }
-  html,body{
-    height:100%;
-    margin:0;
-    font-family: Inter, Roboto, Arial, sans-serif;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    background:#111;
-  }
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", sans-serif;
+        height: 100vh;
+        background: linear-gradient(135deg, #1E90FF, #6A5ACD);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-  /* full-screen background image */
-  .bg {
-    position:fixed;
-    inset:0;
-    background-image: url("/mnt/data/1000710583.jpg");
-    background-size: cover;
-    background-position: center;
-    filter: blur(2px) brightness(0.6);
-    z-index:0;
-  }
+    .login-box {
+        width: 350px;
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0px 10px 25px rgba(0,0,0,0.2);
+        animation: fadeIn 0.8s ease;
+    }
 
-  /* dim overlay */
-  .overlay {
-    position:fixed;
-    inset:0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.45));
-    z-index:1;
-  }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
 
-  /* center container */
-  .wrap {
-    position:relative;
-    z-index:2;
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:24px;
-  }
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #1E90FF;
+    }
 
-  .card {
-    width:100%;
-    max-width:420px;
-    background: var(--card-bg);
-    border-radius:14px;
-    box-shadow: 0 10px 30px rgba(2,6,23,0.5);
-    padding:22px;
-    backdrop-filter: blur(6px) saturate(120%);
-    border:1px solid rgba(255,255,255,0.08);
-  }
+    .input-group {
+        margin-bottom: 15px;
+    }
 
-  .logo {
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:6px;
-  }
-  .logo .icon {
-    width:56px;
-    height:56px;
-    border-radius:10px;
-    background: linear-gradient(135deg,var(--accent), #42a5f5);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    font-weight:700;
-    font-size:20px;
-    box-shadow: 0 6px 18px rgba(25,118,210,0.25);
-  }
-  .logo h1 {
-    margin:0;
-    font-size:18px;
-    letter-spacing:0.2px;
-  }
-  .logo p {
-    margin:0;
-    color:#333;
-    font-size:13px;
-    opacity:0.85;
-  }
+    .input-group label {
+        font-size: 14px;
+        color: #555;
+    }
 
-  .form-row {
-    margin-top:14px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
+    .input-group input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+        transition: 0.3s;
+    }
 
-  input[type="text"], input[type="password"] {
-    width:100%;
-    padding:12px 14px;
-    border-radius:10px;
-    border:1px solid rgba(0,0,0,0.06);
-    font-size:15px;
-    outline:none;
-    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,250,0.9));
-    box-shadow: 0 1px 0 rgba(0,0,0,0.02) inset;
-  }
+    .input-group input:focus {
+        border-color: #1E90FF;
+        box-shadow: 0 0 3px #1E90FF;
+    }
 
-  .pw-row {
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #1E90FF;
+        border: none;
+        color: white;
+        font-size: 17px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
 
-  .show-btn {
-    background:transparent;
-    border:0;
-    font-size:13px;
-    cursor:pointer;
-    color:var(--accent);
-    padding:6px 8px;
-  }
+    button:hover {
+        background: #0c65c7;
+    }
 
-  .login-btn {
-    margin-top:12px;
-    width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:0;
-    background: linear-gradient(90deg,var(--accent), #42a5f5);
-    color:white;
-    font-weight:600;
-    font-size:16px;
-    cursor:pointer;
-    box-shadow: 0 8px 20px rgba(25,118,210,0.25);
-  }
+    .error {
+        margin-top: 10px;
+        color: red;
+        text-align: center;
+        display: none;
+    }
 
-  .helper {
-    margin-top:10px;
-    font-size:13px;
-    color:#444;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-
-  .error {
-    margin-top:10px;
-    color:#b00020;
-    font-size:14px;
-  }
-
-  .small {
-    font-size:12px;
-    opacity:0.8;
-  }
-
-  .center {
-    text-align:center;
-  }
-
-  /* subtle footer note */
-  .footer {
-    margin-top:14px;
-    text-align:center;
-    font-size:12px;
-    color: #222;
-    opacity:0.7;
-  }
-
-  @media (max-width:420px){
-    .card{ padding:18px; border-radius:12px; }
-    .logo .icon { width:48px; height:48px; font-size:18px; }
-  }
+    .success {
+        margin-top: 10px;
+        color: green;
+        text-align: center;
+        display: none;
+    }
 </style>
 </head>
 <body>
 
-<div class="bg"></div>
-<div class="overlay"></div>
+<div class="login-box">
+    <h2>Login</h2>
 
-<div class="wrap">
-  <div class="card" role="main" aria-labelledby="pageTitle">
-    <div class="logo">
-      <div class="icon">JCV</div>
-      <div>
-        <h1 id="pageTitle">JCV Tuition Centre</h1>
-        <p class="small">Sign in to continue</p>
-      </div>
+    <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="username">
     </div>
 
-    <div class="form-row" aria-live="polite">
-      <input id="username" type="text" placeholder="Username" autocomplete="username" />
-      <div class="pw-row">
-        <input id="password" type="password" placeholder="Password" autocomplete="current-password" style="flex:1" />
-        <button class="show-btn" id="togglePw" aria-pressed="false">Show</button>
-      </div>
-
-      <button class="login-btn" id="btnLogin">Log in</button>
-
-      <div id="msg" class="error" role="status" aria-atomic="true"></div>
-
-      <div class="helper">
-        <div class="small">Don't have account? <a href="register.html">Register</a></div>
-        <div class="small"><a href="#" id="forgotLink">Forgot?</a></div>
-      </div>
-
-      <div class="footer">JCV Tuition • Ashok Nagar, Vijayawada</div>
+    <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="password">
     </div>
-  </div>
+
+    <button onclick="login()">Login</button>
+
+    <div class="error" id="error">Invalid username or password</div>
+    <div class="success" id="success">Login Successful!</div>
 </div>
 
 <script>
-/*
-  HOW TO USE:
-  1) Replace SHEET_ID and SHEET_NAME below (your Google sheet).
-     The sheet must have columns: username,password (header exact names)
-     Example sheet URL:
-     https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=0
-  2) We use the public JSON endpoint: https://opensheet.elk.sh/SHEET_ID/SHEET_NAME
-     Make sure the sheet is "Published to web" (File → Publish to web) or publicly viewable.
-  3) The code will fetch the sheet and validate credentials client-side.
-*/
+    // Predefined username & password list
+    const USERS = [
+        { user: "student1", pass: "12345" },
+        { user: "student2", pass: "abcde" },
+        { user: "teacher",  pass: "teacher123" },
+        { user: "admin",    pass: "admin123" }
+    ];
 
-const SHEET_ID = "1_OoMR_jOvU-OvH7Tx41l2JukYq9KjVwkLRa-FTL5DS0";
-const SHEET_NAME = "Login";            // change to your sheet tab name
-const SHEET_JSON = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
+    function login() {
+        let u = document.getElementById("username").value.trim();
+        let p = document.getElementById("password").value.trim();
 
-// If you'd rather use CSV published link, you can replace sheetURL with the CSV export URL.
-// const SHEET_CSV = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/export?format=csv";
+        const match = USERS.find(x => x.user === u && x.pass === p);
 
-const btn = document.getElementById("btnLogin");
-const userInp = document.getElementById("username");
-const pwInp = document.getElementById("password");
-const msg = document.getElementById("msg");
-const togglePw = document.getElementById("togglePw");
+        if (match) {
+            document.getElementById("error").style.display = "none";
+            document.getElementById("success").style.display = "block";
 
-let sheetCache = null; // caches sheet data after first fetch
-
-togglePw.addEventListener("click", () => {
-  const isHidden = pwInp.type === "password";
-  pwInp.type = isHidden ? "text" : "password";
-  togglePw.textContent = isHidden ? "Hide" : "Show";
-  togglePw.setAttribute("aria-pressed", isHidden ? "true" : "false");
-});
-
-btn.addEventListener("click", async () => {
-  msg.textContent = "";
-  const username = userInp.value.trim();
-  const password = pwInp.value;
-
-  if (!username || !password) {
-    msg.textContent = "Please enter username and password.";
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = "Checking...";
-
-  try {
-    let rows = sheetCache;
-    if (!rows) {
-      const res = await fetch(SHEET_JSON);
-      if (!res.ok) throw new Error("Cannot fetch sheet. Check SHEET_ID and your network.");
-      rows = await res.json();
-      sheetCache = rows;
+            // Redirect after login success
+            setTimeout(() => {
+                window.location.href = "dashboard.html"; // change if needed
+            }, 1000);
+        } else {
+            document.getElementById("success").style.display = "none";
+            document.getElementById("error").style.display = "block";
+        }
     }
-
-    // opensheet returns array of rows as objects: { username: "...", password: "...", name:"..." }
-    const found = rows.find(r => String(r.username).trim() === username);
-
-    if (!found) {
-      msg.textContent = "Username not found.";
-      btn.disabled = false;
-      btn.textContent = "Log in";
-      return;
-    }
-
-    // compare password (plain text)
-    if (String(found.password) === password) {
-      // success
-      localStorage.setItem("username", username);
-      // store some profile data if present
-      if (found.name) localStorage.setItem("student_name", found.name);
-      // redirect to dashboard and pass username (or dashboard can read localStorage)
-      window.location.href = "library.html?user=" + encodeURIComponent(username);
-    } else {
-      msg.textContent = "Incorrect password.";
-      btn.disabled = false;
-      btn.textContent = "Log in";
-    }
-
-  } catch (err) {
-    console.error(err);
-    msg.textContent = "Unable to connect to Google Sheets. Check SHEET_ID and publishing settings.";
-    btn.disabled = false;
-    btn.textContent = "Log in";
-  }
-});
-
-// support Enter key
-[userInp, pwInp].forEach(el => {
-  el.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") btn.click();
-  });
-});
-
-// small UX: clear message when typing
-[userInp, pwInp].forEach(el => el.addEventListener("input", () => { msg.textContent = ""; }));
-
-// optional: forgot link action
-document.getElementById("forgotLink").addEventListener("click", (e) => {
-  e.preventDefault();
-  alert("Please contact your administrator to reset password.");
-});
-
 </script>
+
 </body>
 </html>
