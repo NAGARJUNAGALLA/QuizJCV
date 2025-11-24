@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Blocks</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f2f2f2;
+    }
+
+    .container {
+        padding: 15px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    .block {
+        padding: 20px;
+        color: white;
+        text-align: center;
+        border-radius: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        height: 120px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.2s;
+    }
+
+    .block:active {
+        transform: scale(0.95);
+    }
+</style>
+
+</head>
+<body>
+
+<div class="container" id="blockContainer"></div>
+
+<script>
+const blocks = [
+    { title: "Study Material", color: "#FF6F61", htmlFile: "study.html" },
+    { title: "Text Books", color: "#6B5B95", htmlFile: "textbooks.html" },
+    { title: "Practice Books", color: "#88B04B", htmlFile: "practice.html" },
+    { title: "Assignments", color: "#FFA500", htmlFile: "assignments.html" },
+    { title: "Notes", color: "#009688", htmlFile: "notes.html" },
+    { title: "Model Papers", color: "#3F51B5", htmlFile: "modelpapers.html" },
+    { title: "Previous Papers", color: "#9C27B0", htmlFile: "previouspapers.html" },
+    { title: "Videos", color: "#FF5722", htmlFile: "videos.html" },
+    { title: "Online Tests", color: "#4CAF50", htmlFile: "tests.html" },
+    { title: "Work Sheets", color: "#00BCD4", htmlFile: "worksheets.html" },
+    { title: "Formulas", color: "#CDDC39", htmlFile: "formulas.html" },
+    { title: "Syllabus", color: "#9E9E9E", htmlFile: "syllabus.html" },
+    { title: "Chapters", color: "#673AB7", htmlFile: "chapters.html" },
+    { title: "Important Points", color: "#FF9800", htmlFile: "important.html" },
+    { title: "Examples", color: "#795548", htmlFile: "examples.html" },
+    { title: "Animations", color: "#E91E63", htmlFile: "animations.html" },
+    { title: "PDF Library", color: "#607D8B", htmlFile: "pdfs.html" },
+    { title: "Daily Practice", color: "#8BC34A", htmlFile: "dpp.html" },
+    { title: "Exams", color: "#2196F3", htmlFile: "exams.html" },
+    { title: "Live Classes", color: "#F44336", htmlFile: "live.html" }
+];
+
+const container = document.getElementById("blockContainer");
+
+blocks.forEach(block => {
+    const div = document.createElement("div");
+    div.className = "block";
+    div.style.background = block.color;
+    div.innerText = block.title;
+
+    div.onclick = () => {
+        window.location.href = block.htmlFile; // DIRECT OPEN HTML
+    };
+
+    container.appendChild(div);
+});
+</script>
+
+</body>
+</html>
