@@ -3,36 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz</title>
-
+<title>Quiz App</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <!-- MathJax -->
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  options: { renderActions: { addMenu: [] } },
   startup: { typeset: false }
 };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 
 <style>
-body { margin:0; font-family: Arial; background:#f5f7fa; }
-.quiz-container { max-width:800px; margin:auto; padding:20px; }
+body { margin:0; font-family: 'Segoe UI', sans-serif; background: #f5f7fa; }
+.quiz-container { max-width:800px; margin:0 auto; padding:20px; }
 h1,h3 { color:#1E90FF; text-align:center; }
 input, button { font-size:16px; }
 #user-form { text-align:center; margin-top:80px; }
-.options label { display:block; border:1px solid #ccc; border-radius:8px; padding:10px; margin:8px 0; cursor:pointer; }
-.options label:hover { background:#eef3ff; }
-.correct { background:#e8ffe8; border-color:green !important; }
+button { cursor:pointer; }
+.quiz-body { margin-top:20px; }
+.options label { display:block; border:1px solid #ddd; border-radius:8px; padding:10px; margin:8px 0; cursor:pointer; }
+.options label:hover { background:#f0f4ff; border-color:#1e3a8a; }
+.correct { background:#e8fce8; border-color:green !important; }
 .wrong { background:#ffe8e8; border-color:red !important; }
-.question-nav { display:flex; overflow-x:auto; gap:6px; margin-bottom:15px; }
-.question-nav button { width:36px; height:36px; border-radius:50%; border:1px solid #aaa; }
-.question-nav button.active { border:2px solid #1E90FF; }
-.question-nav button.answered { background:#1E90FF; color:white; }
-.quiz-footer { display:flex; justify-content:space-between; }
-.quiz-footer button { flex:1; margin:4px; padding:12px; border:none; border-radius:8px; background:#1E90FF; color:white; }
-#result-section { background:white; padding:15px; margin-top:20px; border-radius:10px; display:none; }
+.question-nav { display:flex; flex-wrap:nowrap; gap:5px; margin-bottom:15px; overflow-x:auto;}
+.question-nav button { width:36px; height:36px; border-radius:50%; border:1px solid #ccc; }
+.question-nav button.active { border:2px solid #1b4332; }
+.question-nav button.answered { background:#1b4332; color:#fff; }
+.quiz-footer { display:flex; justify-content:space-between; margin-top:20px; }
+.quiz-footer button { flex:1; margin:0 5px; padding:10px; border:none; border-radius:8px; background:#1E90FF; color:white; }
+#result-section { margin-top:20px; padding:15px; border-radius:8px; background:#f9f9f9; display:none; }
 </style>
 </head>
 <body>
@@ -46,208 +48,135 @@ input, button { font-size:16px; }
 
 <div id="quiz-area" style="display:none;">
   <div class="quiz-container">
-    
-    <div class="stats" style="display:flex; justify-content:space-between;">
-      <span id="answered">Answered: 0</span>
-      <span id="not-answered">Not Answered: 0</span>
-      <span>⏳ <span id="timer">00:00</span></span>
+    <div class="quiz-body">
+      <div class="stats" style="display:flex; justify-content:space-between;">
+        <span id="answered">Answered: 0</span>
+        <span id="not-answered">Not answered: 0</span>
+        <span>⏱️ <span id="timer">00:00</span></span>
+      </div>
+      <div class="question-nav" id="question-nav"></div>
+      <div id="question-container"></div>
+      <div id="result-section"></div>
     </div>
-
-    <div class="question-nav" id="question-nav"></div>
-
-    <div id="question-container"></div>
-
-    <div id="result-section"></div>
-
     <div class="quiz-footer">
       <button onclick="prevQuestion()">Previous</button>
       <button onclick="submitQuiz()">Submit</button>
       <button onclick="nextQuestion()">Next</button>
     </div>
-
   </div>
 </div>
 
 <script>
-// ============ READ QUIZ ID ============
-const urlParams = new URLSearchParams(window.location.search);
-const QUIZ_ID = urlParams.get("quiz") || "default";
+// ================= CONFIG =================
+const SHEET_JSON_URL = "https://docs.google.com/spreadsheets/d/1qRFUQ_S_7pK_mb-cZb30CwcN6Gkb91A25Eq2JMefZNo/gviz/tq?tqx=out:json"; // Replace YOUR_SHEET_ID
 
-// ============ GOOGLE SHEET URL ============
-const SHEET_JSON_URL =
-  "https://docs.google.com/spreadsheets/d/1qRFUQ_S_7pK_mbcZb30CwcN6Gkb91A25Eq2JMefZNo/gviz/tq?tqx=out:json";
+let questions=[], current=0, answers=[], submitted=false, timeLeft=0, timerInterval;
 
-// ============ GLOBAL VARIABLES ============
-let questions = [];
-let current = 0;
-let answers = [];
-let timeLeft = 0;
-let timerInterval;
-let submitted = false;
-
-// ============ LOAD QUESTIONS FROM SHEET ============
+// ============== LOAD QUESTIONS FROM SHEET =================
 async function loadQuestions(){
   try {
     const res = await fetch(SHEET_JSON_URL);
     let text = await res.text();
     text = text.substring(text.indexOf("{"), text.lastIndexOf("}")+1);
     const data = JSON.parse(text);
-
-    questions = data.table.rows.map(r => ({
-      q: r.c[0]?.v,
-      options: [r.c[1]?.v, r.c[2]?.v, r.c[3]?.v, r.c[4]?.v],
-      answerId: r.c[5]?.v
-    }));
-
+    questions = data.table.rows.map(r=>{
+      return {
+        q: r.c[0].v,
+        options: [r.c[1].v, r.c[2].v, r.c[3].v, r.c[4].v],
+        answerId: r.c[5].v
+      };
+    });
     answers = Array(questions.length).fill(null);
     timeLeft = questions.length * 60;
-  } catch (e) {
-    alert("Error loading quiz. Check Google Sheet.");
+    document.getElementById("user-form").style.display="block";
+  } catch(e) {
+    console.error("Error loading questions:", e);
+    alert("Failed to load questions. Check sheet URL or network.");
   }
 }
 
 window.onload = loadQuestions;
 
-// ============ START QUIZ ============
+// ============== QUIZ FUNCTIONS =================
 function startQuiz(){
   const name = document.getElementById("userName").value.trim();
-  if(!name){ alert("Enter name"); return; }
-
+  if(!name){ alert("Please enter your name"); return; }
   document.getElementById("user-form").style.display="none";
   document.getElementById("quiz-area").style.display="block";
-
-  renderNav();
-  renderQuestion();
-  startTimer();
+  renderNav(); renderQuestion(); startTimer();
 }
 
-// ============ RENDER NAVIGATION ============
 function renderNav(){
   const nav = document.getElementById("question-nav");
-  nav.innerHTML = "";
-
-  questions.forEach((_, i) => {
-    const b = document.createElement("button");
-    b.textContent = i + 1;
-    b.className =
-      (i === current ? "active " : "") +
-      (answers[i] != null ? "answered" : "");
-    b.onclick = () => { current = i; renderQuestion(); };
+  nav.innerHTML="";
+  questions.forEach((_,i)=>{
+    const b=document.createElement("button");
+    b.textContent=i+1;
+    b.className=(i===current?"active ":"")+(answers[i]!=null?"answered":"");
+    b.onclick=()=>{current=i; renderQuestion();};
     nav.appendChild(b);
   });
-
   updateStats();
 }
 
-// ============ RENDER QUESTION ============
 function renderQuestion(){
   const q = questions[current];
   const c = document.getElementById("question-container");
-
-  let html = `<h3>Question ${current+1}/${questions.length}</h3>
-              <p>${q.q}</p>
-              <div class='options'>`;
-
-  q.options.forEach((opt, i) => {
-    let cls = "";
+  let h=`<h4>Question ${current+1} of ${questions.length}</h4><p>${q.q}</p><div class="options">`;
+  q.options.forEach((o,i)=>{
+    let cls="";
     if(submitted){
-      if(i === q.answerId) cls = "correct";
-      else if(answers[current] === i) cls = "wrong";
+      if(i===q.answerId) cls="correct";
+      else if(answers[current]===i && i!==q.answerId) cls="wrong";
     }
-
-    html += `
-      <label class="${cls}">
-        <input type="radio" name="opt" value="${i}"
-        onchange="selectOption(${i})"
-        ${answers[current]===i ? 'checked':''}
-        ${submitted?'disabled':''}>
-        ${opt}
-      </label>`;
+    h+=`<label class="${cls}"><input type="radio" name="opt" value="${i}" ${answers[current]===i?'checked':''} ${submitted?'disabled':''} onchange="selectOpt(${i})"> ${o}</label>`;
   });
-
-  html += "</div>";
-
-  c.innerHTML = html;
+  h+="</div>";
+  c.innerHTML=h;
   renderNav();
-
-  if(MathJax.typesetPromise)
-      MathJax.typesetPromise([c]);
+  if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([c]);
 }
 
-// ============ SELECT OPTION ============
-function selectOption(i){
-  if(submitted) return;
-  answers[current] = i;
-  renderNav();
-}
+function selectOpt(i){ if(submitted) return; answers[current]=i; renderNav(); }
+function nextQuestion(){ if(current<questions.length-1){ current++; renderQuestion(); } }
+function prevQuestion(){ if(current>0){ current--; renderQuestion(); } }
 
-// ============ PREV / NEXT ============
-function nextQuestion(){ if(current < questions.length-1){ current++; renderQuestion(); } }
-function prevQuestion(){ if(current > 0){ current--; renderQuestion(); } }
-
-// ============ STATS ============
 function updateStats(){
-  const ans = answers.filter(a => a != null).length;
-  document.getElementById("answered").innerText = "Answered: " + ans;
-  document.getElementById("not-answered").innerText = "Not Answered: " + (questions.length - ans);
+  const a = answers.filter(x=>x!==null).length;
+  document.getElementById("answered").textContent="Answered: "+a;
+  document.getElementById("not-answered").textContent="Not answered: "+(questions.length-a);
 }
 
-// ============ TIMER ============
 function startTimer(){
   updateTimer();
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimer();
-    if(timeLeft <= 0){
-      clearInterval(timerInterval);
-      submitQuiz();
-    }
-  }, 1000);
+  timerInterval = setInterval(()=>{ timeLeft--; updateTimer(); if(timeLeft<=0){ clearInterval(timerInterval); submitQuiz(); } },1000);
 }
 
 function updateTimer(){
-  const m = Math.floor(timeLeft / 60);
-  const s = timeLeft % 60;
-  document.getElementById("timer").innerText =
-    String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+  const m=Math.floor(timeLeft/60), s=timeLeft%60;
+  document.getElementById("timer").textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-// ============ SUBMIT QUIZ ============
 function submitQuiz(){
   if(submitted) return;
-  submitted = true;
-
+  submitted=true;
   clearInterval(timerInterval);
-
-  let correct = 0, wrong = 0;
-
-  questions.forEach((q, i) => {
-    if(answers[i] != null){
-      if(answers[i] === q.answerId) correct++;
-      else wrong++;
-    }
-  });
-
-  const skipped = questions.length - (correct + wrong);
-  const score = Math.round((correct / questions.length) * 100);
-
-  // ⭐ SAVE SCORE FOR LIBRARY PAGE ⭐
-  localStorage.setItem("score_" + QUIZ_ID, score);
-
-  const name = document.getElementById("userName").value;
-  const res = document.getElementById("result-section");
-
-  res.innerHTML = `
-    <h3>Result Summary</h3>
+  let correct=0, wrong=0;
+  questions.forEach((q,i)=>{ if(answers[i]!=null){ if(answers[i]===q.answerId) correct++; else wrong++; } });
+  const skipped=questions.length-(correct+wrong);
+  const total=questions.length;
+  const score=Math.round((correct/total)*100);
+  const name=document.getElementById("userName").value;
+  const html=`<h3>Result Summary</h3>
     <p><b>Name:</b> ${name}</p>
-    <p><b>Total Questions:</b> ${questions.length}</p>
+    <p><b>Total Questions:</b> ${total}</p>
     <p><b>Correct:</b> ${correct}</p>
     <p><b>Wrong:</b> ${wrong}</p>
     <p><b>Skipped:</b> ${skipped}</p>
-    <p><b>Score:</b> ${score}%</p>
-  `;
-  res.style.display = "block";
-
+    <p><b>Score:</b> ${score}%</p>`;
+  const resSec = document.getElementById("result-section");
+  resSec.innerHTML=html;
+  resSec.style.display="block";
   renderQuestion();
 }
 </script>
