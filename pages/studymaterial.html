@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Material</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+  h1 { color: #1E90FF; }
+  select { padding: 8px; margin: 10px 0; width: 220px; }
+  #content { margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+</style>
+
+<!-- MathJax -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async
+ src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+<body>
+
+<h1>Study Material</h1>
+
+<label for="classSelect">Select Class:</label>
+<select id="classSelect">
+  <option value="">--Select Class--</option>
+</select>
+
+<br>
+
+<label for="subjectSelect">Select Subject:</label>
+<select id="subjectSelect">
+  <option value="">--Select Subject--</option>
+</select>
+
+<br>
+
+<label for="chapterSelect">Select Chapter:</label>
+<select id="chapterSelect">
+  <option value="">--Select Chapter--</option>
+</select>
+
+<div id="content">
+  <h2>Chapter Content</h2>
+  <div id="chapterContent">Select a chapter to see the content.</div>
+</div>
+
+<script>
+  // Full template data for Classes 1-10
+  const studyData = {
+    "1": {
+      "Math": {"Numbers":"Content for Numbers.","Addition":"Content for Addition."},
+      "English": {"Alphabet":"Content for Alphabet.","Simple Words":"Content for Simple Words."},
+      "Science": {"Plants":"Content for Plants.","Animals":"Content for Animals."}
+    },
+    "2": {
+      "Math": {"Addition & Subtraction":"Content for Addition & Subtraction.","Shapes":"Content for Shapes."},
+      "English": {"Grammar Basics":"Content for Grammar Basics.","Stories":"Content for Stories."},
+      "Science": {"Living & Non-living":"Content for Living & Non-living.","Weather":"Content for Weather."}
+    },
+    "3": {
+      "Math": {"Multiplication":"Content for Multiplication.","Division":"Content for Division."},
+      "English": {"Tenses":"Content for Tenses.","Comprehension":"Content for Comprehension."},
+      "Science": {"Plants & Animals":"Content for Plants & Animals.","Water Cycle":"Content for Water Cycle."}
+    },
+    "4": {
+      "Math": {"Fractions":"Content for Fractions.","Geometry":"Content for Geometry."},
+      "English": {"Grammar":"Content for Grammar.","Stories":"Content for Stories."},
+      "Science": {"Food":"Content for Food.","Energy":"Content for Energy."}
+    },
+    "5": {
+      "Math": {"Decimals":"Content for Decimals.","Measurement":"Content for Measurement."},
+      "English": {"Composition":"Content for Composition.","Poems":"Content for Poems."},
+      "Science": {"Force & Motion":"Content for Force & Motion.","Environment":"Content for Environment."}
+    },
+    "6": {
+      "Math": {"Algebra":"Content for Algebra. Example: \\(x+2=5\\)","Geometry":"Content for Geometry. Example: \\(Area = \\pi r^2\\)"},
+      "Science": {"Light":"Content for Light. Formula: \\(c=\\lambda \\nu\\)","Heat":"Content for Heat. Example: \\(Q=mc\\Delta T\\)"},
+      "Social":"Content for Social Studies chapters here."
+    },
+    "7": {
+      "Math": {"Algebra":"Content for Algebra.","Geometry":"Content for Geometry."},
+      "Science": {"Electricity":"Content for Electricity.","Magnetism":"Content for Magnetism."},
+      "Social":"Content for Social Studies chapters here."
+    },
+    "8": {
+      "Math": {"Algebra":"Content for Algebra.","Mensuration":"Content for Mensuration."},
+      "Science": {"Light":"Content for Light.","Sound":"Content for Sound."},
+      "Social":"Content for Social Studies chapters here."
+    },
+    "9": {
+      "Math": {"Coordinate Geometry":"Content for Coordinate Geometry.","Probability":"Content for Probability."},
+      "Science": {"Physics":"Content for Physics.","Chemistry":"Content for Chemistry.","Biology":"Content for Biology."},
+      "Social":"Content for Social Studies chapters here."
+    },
+    "10": {
+      "Math": {"Trigonometry":"Content for Trigonometry.","Statistics":"Content for Statistics."},
+      "Science": {"Physics":"Content for Physics.","Chemistry":"Content for Chemistry.","Biology":"Content for Biology."},
+      "Social":"Content for Social Studies chapters here."
+    }
+  };
+
+  const classSelect = document.getElementById('classSelect');
+  const subjectSelect = document.getElementById('subjectSelect');
+  const chapterSelect = document.getElementById('chapterSelect');
+  const chapterContent = document.getElementById('chapterContent');
+
+  // Populate classes
+  for (let cls in studyData) {
+    const option = document.createElement('option');
+    option.value = cls;
+    option.textContent = 'Class ' + cls;
+    classSelect.appendChild(option);
+  }
+
+  // Populate subjects
+  classSelect.addEventListener('change', function() {
+    const selectedClass = this.value;
+    subjectSelect.innerHTML = '<option value="">--Select Subject--</option>';
+    chapterSelect.innerHTML = '<option value="">--Select Chapter--</option>';
+    chapterContent.innerHTML = 'Select a chapter to see the content.';
+    if(studyData[selectedClass]){
+      Object.keys(studyData[selectedClass]).forEach(sub => {
+        const option = document.createElement('option');
+        option.value = sub;
+        option.textContent = sub;
+        subjectSelect.appendChild(option);
+      });
+    }
+  });
+
+  // Populate chapters
+  subjectSelect.addEventListener('change', function() {
+    const selectedClass = classSelect.value;
+    const selectedSubject = this.value;
+    chapterSelect.innerHTML = '<option value="">--Select Chapter--</option>';
+    chapterContent.innerHTML = 'Select a chapter to see the content.';
+    if(studyData[selectedClass] && studyData[selectedClass][selectedSubject]){
+      const chapters = studyData[selectedClass][selectedSubject];
+      if(typeof chapters === 'object'){
+        Object.keys(chapters).forEach(ch => {
+          const option = document.createElement('option');
+          option.value = ch;
+          option.textContent = ch;
+          chapterSelect.appendChild(option);
+        });
+      } else {
+        // If content is string, show it directly
+        chapterContent.innerHTML = chapters;
+      }
+    }
+  });
+
+  // Show chapter content
+  chapterSelect.addEventListener('change', function() {
+    const selectedClass = classSelect.value;
+    const selectedSubject = subjectSelect.value;
+    const selectedChapter = this.value;
+    const chapters = studyData[selectedClass][selectedSubject];
+    if(chapters && chapters[selectedChapter]){
+      chapterContent.innerHTML = chapters[selectedChapter];
+      MathJax.typesetPromise();
+    } else {
+      chapterContent.innerHTML = 'Select a chapter to see the content.';
+    }
+  });
+
+</script>
+
+</body>
+</html>
