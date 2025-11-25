@@ -10,15 +10,50 @@
         font-family: Arial, sans-serif;
         margin: 0;
         background: #f2f2f2;
+        transition: margin-left 0.3s;
     }
 
-    .container {
-        margin-top:60px;
-        margin-bottom:60px;
+    /* Side navigation */
+    .sidenav {
+        height: 100vh;
+        width: 0; /* hidden by default */
+        position: fixed;
+        left: 0;
+        top: 0;
+        background-color: white; /* changed to white */
+        border-right: 3px solid #1e3a8a; /* blue border */
+        padding-top: 60px; /* below header */
+        overflow-y: auto;
+        transition: width 0.3s;
+        z-index: 5;
+    }
+
+    .sidenav a {
+        padding: 12px 16px;
+        text-decoration: none;
+        font-size: 16px;
+        color: #1e3a8a; /* blue text */
+        display: block;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        transition: background 0.2s, color 0.2s;
+        font-weight: 500;
+    }
+
+    .sidenav a:hover {
+        background-color: #1e3a8a; /* hover background blue */
+        color: white; /* text white on hover */
+    }
+
+    /* Main container */
+    .main {
+        margin-left: 0; /* start with sidenav hidden */
         padding: 15px;
+        margin-top: 60px;
+        margin-bottom: 60px;
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 15px;
+        transition: margin-left 0.3s;
     }
 
     .block {
@@ -39,65 +74,75 @@
     .block:active {
         transform: scale(0.95);
     }
+
     /* HEADER */
-.quiz-header {
-  background-color: #1e3a8a;
- /* background-image: 
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 20px 20px;*/
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  font-weight: 600;
-  font-size: 18px;
-  position: fixed;
-  top: 0;
-  left:0;
-  right:0;
-  z-index: 10;
-}
+    .quiz-header {
+        background-color: #1e3a8a;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        font-weight: 600;
+        font-size: 18px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+    }
+
+    /* Hamburger icon */
+    .hamburger {
+        font-size: 24px;
+        cursor: pointer;
+        margin-right: 10px;
+        color: white;
+    }
+
     /* Bottom Navigation */
-.navbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #1e3a8a;
-  /*background-image: 
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 20px 20px;*/
-  display: flex;
-  justify-content: space-around;
-  padding: 10px;
-  border-top: 1px solid #ccc;
-color:white;
-}
+    .navbar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #1e3a8a;
+        display: flex;
+        justify-content: space-around;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+        color:white;
+        z-index: 10;
+    }
 
-.nav-item {
-  text-align: center;
-  font-size: 12px;
-  cursor: pointer;
-}
+    .nav-item {
+        text-align: center;
+        font-size: 12px;
+        cursor: pointer;
+    }
 
-.nav-item:hover {
-  opacity: 0.7;
-}
+    .nav-item:hover {
+        opacity: 0.7;
+    }
+
 </style>
-
 </head>
 <body>
-    <div class="quiz-header">
-    <div id="quiz-title">JCV ICE <span> JCV Institute of Competitive Exams</span></div>
-       
-    <!--<div>⏱️ <span id="timer"></span></div>
-    <i class="fa-solid fa-expand full-icon" title="Fullscreen" onclick="toggleFullscreen()"></i>-->
-  </div>
 
-<div class="container" id="blockContainer"></div>
+<!-- Side Navigation -->
+<div class="sidenav" id="sideNav"></div>
+
+<!-- Top Header -->
+<div class="quiz-header">
+    <div style="display:flex; align-items:center;">
+        <span class="hamburger" onclick="toggleNav()">☰</span>
+        <div id="quiz-title">JCV ICE <span> JCV Institute of Competitive Exams</span></div>
+    </div>
+</div>
+
+<!-- Main Grid Blocks -->
+<div class="main" id="blockContainer"></div>
+
 <!-- Bottom Navigation -->
 <div class="navbar">
   <div class="nav-item" onclick="goHome()">🏠<br>Home</div>
@@ -111,41 +156,47 @@ color:white;
 const blocks = [
     { title: "Study Material", color: "#FF6F61", htmlFile: "pages/studymaterial.html" },
     { title: "Text Books", color: "#6B5B95", htmlFile: "pages/textbooks.html" },
-   // { title: "Practice Books", color: "#88B04B", htmlFile: "practice.html" },
-  // { title: "Assignments", color: "#FFA500", htmlFile: "assignments.html" },
-  //  { title: "Notes", color: "#009688", htmlFile: "notes.html" },
     { title: "Model Papers", color: "#3F51B5", htmlFile: "modelpapers.html" },
     { title: "Previous Papers", color: "#9C27B0", htmlFile: "previouspapers.html" },
-   // { title: "Videos", color: "#FF5722", htmlFile: "videos.html" },
     { title: "Online Tests", color: "#4CAF50", htmlFile: "library.html" },
-  //  { title: "Work Sheets", color: "#00BCD4", htmlFile: "worksheets.html" },
     { title: "Formulas", color: "#CDDC39", htmlFile: "formulas.html" },
     { title: "Syllabus", color: "#9E9E9E", htmlFile: "syllabus.html" },
- //   { title: "Chapters", color: "#673AB7", htmlFile: "chapters.html" },
- //   { title: "Important Points", color: "#FF9800", htmlFile: "important.html" },
- //   { title: "Examples", color: "#795548", htmlFile: "examples.html" },
- //   { title: "Animations", color: "#E91E63", htmlFile: "animations.html" },
-//    { title: "PDF Library", color: "#607D8B", htmlFile: "pdfs.html" },
-//    { title: "Daily Practice", color: "#8BC34A", htmlFile: "dpp.html" },
-//    { title: "Exams", color: "#2196F3", htmlFile: "exams.html" },
-//    { title: "Live Classes", color: "#F44336", htmlFile: "library.html" }
 ];
 
+// Populate main blocks
 const container = document.getElementById("blockContainer");
-
 blocks.forEach(block => {
     const div = document.createElement("div");
     div.className = "block";
     div.style.background = block.color;
     div.innerText = block.title;
-
-    div.onclick = () => {
-        window.location.href = block.htmlFile; // DIRECT OPEN HTML
-    };
-
+    div.onclick = () => window.location.href = block.htmlFile;
     container.appendChild(div);
 });
-    // Bottom navbar
+
+// Populate side nav
+const sideNav = document.getElementById("sideNav");
+blocks.forEach(block => {
+    const a = document.createElement("a");
+    a.innerText = block.title;
+    a.href = block.htmlFile;
+    sideNav.appendChild(a);
+});
+
+// Toggle sidebar
+let navOpen = false; // hidden by default
+function toggleNav() {
+    if(navOpen) {
+        document.getElementById("sideNav").style.width = "0";
+        document.querySelector(".main").style.marginLeft = "0";
+    } else {
+        document.getElementById("sideNav").style.width = "200px";
+        document.querySelector(".main").style.marginLeft = "200px";
+    }
+    navOpen = !navOpen;
+}
+
+// Bottom navbar functions
 function goHome() { window.location.href = "dashboard.html"; }
 function goLibrary() { window.location.href = "library.html"; }
 </script>
