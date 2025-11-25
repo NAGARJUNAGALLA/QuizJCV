@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Slides → Video with Voiceover</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;padding:18px;background:#f6f8fb;color:#111}
+    h1{font-size:20px;margin:0 0 12px}
+    .row{display:flex;gap:12px;align-items:flex-start}
+    .panel{background:white;padding:12px;border-radius:8px;box-shadow:0 1px 4px rgba(20,40,80,0.06);flex:1}
+    input[type=file]{display:block}
+    .thumbs{display:flex;gap:8px;flex-wrap:wrap;padding-top:8px}
+    .thumb{width:110px;height:70px;border:1px solid #ddd;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+    .thumb img{max-width:100%;max-height:100%}
+    .thumb .index{position:absolute;left:4px;top:4px;background:rgba(0,0,0,0.6);color:white;padding:2px 6px;border-radius:4px;font-size:12px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    button{padding:8px 10px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer}
+    button.primary{background:#0b76ff;color:white;border-color:#0b76ff}
+    canvas{background:#000;width:100%;height:auto;border-radius:6px}
+    .slide-list{max-height:260px;overflow:auto}
+    .recording-dot{width:10px;height:10px;border-radius:50%;background:red;display:inline-block;margin-right:6px}
+    label{display:block;margin-top:8px}
+    .small{font-size:13px;color:#555}
+    .status{margin-top:8px;color:#333}
+  </style>
+</head>
+<body>
+  <h1>Create a video from slides with voiceover</h1>
+  <div class="row">
+    <div class="panel" style="flex:0.9">
+      <strong>1) Upload slide images</strong>
+      <input id="inputImages" type="file" accept="image/*" multiple>
+      <div class="thumbs" id="thumbs"></div>
+
+      <label class="small">Reorder slides by drag & drop the thumbnails. Click a thumbnail to select that slide.</label>
+
+      <div style="margin-top:12px">
+        <strong>2) Record voiceover per slide</strong>
+        <div class="controls">
+          <button id="recordBtn">Start Recording (selected slide)</button>
+          <button id="stopRecBtn" disabled>Stop</button>
+          <button id="playSlideAudioBtn" disabled>Play Slide Audio</button>
+          <button id="deleteAudioBtn" disabled>Delete Slide Audio</button>
+        </div>
+        <div id="recStatus" class="status small"></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <strong>3) Preview combined</strong>
+        <div class="controls">
+          <button id="previewBtn">Preview Combined (slides + audio)</button>
+          <button id="stopPreviewBtn" disabled>Stop Preview</button>
+        </div>
+        <div id="previewStatus" class="status small"></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <strong>4) Export video</strong>
+        <div class="controls">
+          <button id="exportBtn" class="primary">Export WebM Video</button>
+        </div>
+        <div id="exportStatus" class="status small"></div>
+      </div>
+
+    </div>
+
+    <div class="panel" style="flex:1">
+      <strong>Canvas (preview)</strong>
+      <canvas id="canvas" width="1280" height="720"></canvas>
+      <div style="margin-top:8px">
+        <label>Video resolution: <select id="resolution"><option value="1280x720">1280×720</option><option value="1920x1080">1920×1080</option><option value="854x480">854×480</option></select></label>
+        <label>Slide transition: <select id="transition"><option value="none">None</option><option value="fade">Fade (300ms)</option></select></label>
+      </div>
+      <div style="margin-top:10px">
+        <strong>Slides</strong>
+        <div class="slide-list" id="slideList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+// --- App state ---
+const slides = []; // {file, img, audioBlob, audioUrl, audioBuffer}
+let selectedIndex = -1;
+let mediaRecorder = null;
+let recordedChunks = [];
+let audioContext = null;
+let recordingStream = null;
+let isPreviewing = false;
+
+const inputImages = document.getElementById('inputImages');
+const thumbs = document.getElementById('thumbs');
+const slideList = document.getElementById('slideList');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const recordBtn = document.getElementById('recordBtn');
+const stopRecBtn = document.getElementById('stopRecBtn');
+const playSlideAudioBtn = document.getElementById('playSlideAudioBtn');
+const deleteAudioBtn = document.getElementById('deleteAudioBtn');
+const recStatus = document.getElementById('recStatus');
+const previewBtn = document.getElementById('previewBtn');
+const stopPreviewBtn = document.getElementById('stopPreviewBtn');
+const previewStatus = document.getElementById('previewStatus');
+const exportBtn = document.getElementById('exportBtn');
+const exportStatus = document.getElementById('exportStatus');
+const resolutionSelect = document.getElementById('resolution');
+const transitionSelect = document.getElementById('transition');
+
+// --- Helpers ---
+function bytesToSize(bytes){ const units=['B','KB','MB','GB']; let i=0; while(bytes>=1024 && i<units.length-1){bytes/=1024;i++;} return bytes.toFixed(1)+units[i]; }
+
+function renderThumbs(){
+  thumbs.innerHTML='';
+  slideList.innerHTML='';
+  slides.forEach((s,i)=>{
+    const div=document.createElement('div'); div.className='thumb'; div.draggable=true; div.dataset.index=i;
+    if(s.img) div.appendChild(s.img.cloneNode());
+    const idx = document.createElement('div'); idx.className='index'; idx.textContent = i+1; div.appendChild(idx);
+    div.addEventListener('click', ()=>selectSlide(i));
+    div.addEventListener('dragstart',(e)=>{ e.dataTransfer.setData('text/plain', i); });
+    div.addEventListener('dragover',(e)=>e.preventDefault());
+    div.addEventListener('drop',(e)=>{ e.preventDefault(); const from = +e.dataTransfer.getData('text/plain'); const to = i; reorderSlides(from,to); });
+    thumbs.appendChild(div);
+
+    // slide list row
+    const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='6px 0';
+    row.innerHTML = `<div><strong>Slide ${i+1}</strong> <span class="small">${s.file.name}</span></div>`;
+    const meta = document.createElement('div');
+    const audioLabel = document.createElement('div'); audioLabel.className='small'; audioLabel.textContent = s.audioBlob ? `Audio: ${bytesToSize(s.audioBlob.size)}` : 'No audio';
+    meta.appendChild(audioLabel);
+    row.appendChild(meta);
+    slideList.appendChild(row);
+  });
+}
+
+function reorderSlides(from,to){ if(from===to) return; const item=slides.splice(from,1)[0]; slides.splice(to,0,item); renderThumbs(); selectSlide(to); }
+
+function selectSlide(i){ selectedIndex=i; recStatus.textContent=''; updateControls(); drawCurrentSlide(); }
+
+function updateControls(){ const s = slides[selectedIndex]; playSlideAudioBtn.disabled = !(s && s.audioBlob);
+  deleteAudioBtn.disabled = !(s && s.audioBlob);
+}
+
+function drawCurrentSlide(){ if(selectedIndex<0 || !slides[selectedIndex]){ ctx.fillStyle='#222'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#fff'; ctx.font='20px sans-serif'; ctx.fillText('No slide selected',20,40); return; }
+  const img = slides[selectedIndex].img;
+  fitImageToCanvas(img);
+}
+
+function fitImageToCanvas(img){ // draw image to cover canvas
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const cw=canvas.width, ch=canvas.height; const iw=img.naturalWidth, ih=img.naturalHeight;
+  const r=Math.max(cw/iw, ch/ih); const nw=iw*r, nh=ih*r; const x=(cw-nw)/2, y=(ch-nh)/2;
+  ctx.drawImage(img, x, y, nw, nh);
+}
+
+// --- Image upload ---
+inputImages.addEventListener('change', async (e)=>{
+  const files = Array.from(e.target.files);
+  for(const file of files){
+    if(!file.type.startsWith('image/')) continue;
+    const url = URL.createObjectURL(file);
+    const img = new Image(); img.src = url; await img.decode();
+    slides.push({file, img, audioBlob:null, audioUrl:null, audioBuffer:null});
+  }
+  if(slides.length>0 && selectedIndex===-1) selectedIndex=0;
+  renderThumbs(); updateControls(); drawCurrentSlide();
+});
+
+// --- Recording per slide ---
+recordBtn.addEventListener('click', async ()=>{
+  if(selectedIndex<0) return alert('Select a slide first');
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return alert('getUserMedia not supported');
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    recordingStream = stream;
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = e=>{ if(e.data.size) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = async ()=>{
+      const blob = new Blob(recordedChunks,{type:'audio/webm'});
+      slides[selectedIndex].audioBlob = blob;
+      slides[selectedIndex].audioUrl = URL.createObjectURL(blob);
+      // decode into audioBuffer for later stitching
+      if(!audioContext) audioContext = new (window.AudioContext||window.webkitAudioContext)();
+      const arr = await blob.arrayBuffer();
+      slides[selectedIndex].audioBuffer = await audioContext.decodeAudioData(arr);
+      recStatus.textContent = `Recorded audio for slide ${selectedIndex+1} — ${bytesToSize(blob.size)}`;
+      updateControls(); renderThumbs();
+      // stop all tracks
+      recordingStream.getTracks().forEach(t=>t.stop()); recordingStream=null;
+    };
+    mediaRecorder.start();
+    recordBtn.disabled=true; stopRecBtn.disabled=false; recStatus.innerHTML = '<span class="recording-dot"></span> Recording...';
+  }catch(err){ console.error(err); alert('Could not start audio recording: '+err.message); }
+});
+
+stopRecBtn.addEventListener('click', ()=>{ if(mediaRecorder && mediaRecorder.state==='recording') mediaRecorder.stop(); recordBtn.disabled=false; stopRecBtn.disabled=true; });
+
+playSlideAudioBtn.addEventListener('click', ()=>{
+  const s = slides[selectedIndex]; if(!s || !s.audioUrl) return; const a = new Audio(s.audioUrl); a.play();
+});
+
+deleteAudioBtn.addEventListener('click', ()=>{ const s=slides[selectedIndex]; if(!s) return; s.audioBlob=null; s.audioUrl=null; s.audioBuffer=null; recStatus.textContent=''; updateControls(); renderThumbs(); });
+
+// --- Preview combined (non-recorded export path) ---
+let previewTimer = null;
+previewBtn.addEventListener('click', async ()=>{
+  if(slides.length===0) return alert('Add slides first');
+  if(!audioContext) audioContext = new (window.AudioContext||window.webkitAudioContext)();
+  // If at least one slide has audio, do combined preview. Else simple fixed-duration per slide
+  isPreviewing=true; previewBtn.disabled=true; stopPreviewBtn.disabled=false; previewStatus.textContent='Previewing...';
+  // compute durations
+  const durations = slides.map(s=> s.audioBuffer ? s.audioBuffer.duration : 3); // default 3s
+  let elapsed=0; let idx=0;
+  drawSlideAtIndex(idx);
+  previewTimer = setInterval(()=>{
+    elapsed+=0.2; if(elapsed>=durations[idx]){ elapsed=0; idx++; if(idx>=slides.length) { stopPreview(); } else drawSlideAtIndex(idx); }
+  },200);
+
+});
+
+stopPreviewBtn.addEventListener('click', stopPreview);
+function stopPreview(){ isPreviewing=false; previewBtn.disabled=false; stopPreviewBtn.disabled=true; previewStatus.textContent=''; if(previewTimer) clearInterval(previewTimer); }
+
+function drawSlideAtIndex(i){ const img = slides[i].img; if(!img) return; if(transitionSelect.value==='fade'){
+  // simple fade
+  let alpha=0; const dur=300; const steps=30; const step=dur/steps; let c=0; const iv=setInterval(()=>{ c++; alpha = c/steps; ctx.globalAlpha=alpha; fitImageToCanvas(img); if(c>=steps){ clearInterval(iv); ctx.globalAlpha=1; } }, step);
+ } else { ctx.globalAlpha=1; fitImageToCanvas(img); } }
+
+// --- Export video by concatenating audio buffers and capturing canvas + audio stream ---
+exportBtn.addEventListener('click', async ()=>{
+  if(slides.length===0) return alert('Add slides first');
+  exportBtn.disabled=true; exportStatus.textContent='Preparing...';
+  try{
+    if(!audioContext) audioContext = new (window.AudioContext||window.webkitAudioContext)();
+
+    // Ensure all audioBuffers exist (for slides without audio we create silent buffers of 3s)
+    const buffers = [];
+    for(const s of slides){ if(s.audioBuffer) buffers.push(s.audioBuffer); else { const sr = audioContext.sampleRate; const len = sr * 3; const silent = audioContext.createBuffer(1,len,sr); buffers.push(silent); } }
+
+    // concatenate into single buffer (support mono-to-stereo by copying)
+    const numChannels = Math.max(...buffers.map(b=>b.numberOfChannels));
+    const totalLength = buffers.reduce((sum,b)=> sum + b.length, 0);
+    const outBuf = audioContext.createBuffer(numChannels, totalLength, audioContext.sampleRate);
+    let offset = 0;
+    for(const b of buffers){
+      for(let ch=0; ch<numChannels; ch++){
+        const src = b.numberOfChannels>ch ? b.getChannelData(ch) : b.getChannelData(0);
+        outBuf.getChannelData(ch).set(src, offset);
+      }
+      offset += b.length;
+    }
+
+    // compute per-slide start times (seconds)
+    const slideStartTimes = []; let t=0; for(const b of buffers){ slideStartTimes.push(t); t += b.length / audioContext.sampleRate; }
+
+    // prepare canvas size
+    const [w,h] = resolutionSelect.value.split('x').map(Number);
+    canvas.width = w; canvas.height = h;
+
+    // create destination for audio playback capture
+    const dest = audioContext.createMediaStreamDestination();
+    const source = audioContext.createBufferSource(); source.buffer = outBuf; source.connect(dest); source.connect(audioContext.destination);
+
+    // capture canvas stream
+    const canvasStream = canvas.captureStream(30); // 30 fps
+    // merge with audio stream
+    const mixedStream = new MediaStream();
+    // add canvas tracks
+    canvasStream.getVideoTracks().forEach(t=>mixedStream.addTrack(t));
+    // add audio track from dest
+    dest.stream.getAudioTracks().forEach(t=>mixedStream.addTrack(t));
+
+    // prepare recorder
+    const options = {mimeType: 'video/webm;codecs=vp8,opus'};
+    const recorder = new MediaRecorder(mixedStream, options);
+    const outChunks = [];
+    recorder.ondataavailable = e=>{ if(e.data && e.data.size) outChunks.push(e.data); };
+    recorder.onstop = ()=>{
+      const blob = new Blob(outChunks, {type: 'video/webm'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download = 'slides-video.webm'; a.textContent = 'Download video (right click and Save as...)';
+      exportStatus.innerHTML = `Export ready — <a href="${url}" download="slides-video.webm">Download video</a> (${bytesToSize(blob.size)})`;
+      exportBtn.disabled=false;
+    };
+
+    // start recording and playback
+    recorder.start();
+    // schedule slide drawing in sync with audio playback
+    source.start();
+    const startTime = audioContext.currentTime;
+
+    // Frame loop: draw correct slide according to current playback time
+    let rafId = null;
+    function frame(){ const playPos = audioContext.currentTime - startTime; // seconds
+      // find current slide index
+      let idx = slideStartTimes.length-1; for(let i=0;i<slideStartTimes.length;i++){ if(playPos < slideStartTimes[i] + (buffers[i].length / audioContext.sampleRate)){ idx = i; break; } }
+      // draw
+      const img = slides[idx].img; if(img) fitImageToCanvas(img);
+      rafId = requestAnimationFrame(frame);
+    }
+    frame();
+
+    // stop when audio ends
+    source.onended = ()=>{
+      setTimeout(()=>{
+        recorder.stop(); if(rafId) cancelAnimationFrame(rafId);
+      }, 200);
+    };
+
+    exportStatus.textContent = 'Recording...';
+
+  }catch(err){ console.error(err); alert('Export failed: '+err.message); exportBtn.disabled=false; exportStatus.textContent='Failed'; }
+});
+
+// draw placeholder
+ctx.fillStyle='#222'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#fff'; ctx.font='20px sans-serif'; ctx.fillText('Upload slides to begin',20,40);
+
+  </script>
+</body>
+</html>
