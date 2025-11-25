@@ -1,72 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1, user-scalable=no">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
 <title>Multi-Quiz App</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- MathJax (kept as you had) -->
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  options: { renderActions: { addMenu: [] } },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 
 <style>
-body { margin:0; font-family: 'Segoe UI', sans-serif; background:#eef2f7; }
-.container { max-width:800px; margin:0 auto; padding:20px; }
-
-h2,h3 { text-align:center; color:#1E90FF; }
-
-input, select, button { font-size:16px; padding:10px; border-radius:6px; border:1px solid #ccc; width:90%; }
-
-button { cursor:pointer; background:#1E90FF; color:white; border:none; margin-top:10px; }
-
-.option-label { display:block; padding:10px; margin-top:10px; border-radius:6px; border:1px solid #ccc; }
-
-.correct { background:#d4ffd4; border-color:green; }
-.wrong   { background:#ffd4d4; border-color:red; }
-
-.nav-buttons { display:flex; justify-content:space-between; margin-top:20px; }
-.nav-buttons button { width:32%; }
-
-#result-box { background:white; padding:15px; border-radius:6px; display:none; }
+  body { margin:0; font-family: 'Segoe UI', sans-serif; background: #f5f7fa; }
+  .quiz-container { max-width:900px; margin:0 auto; padding:20px; }
+  h1,h3 { color:#1E90FF; text-align:center; }
+  input, button, select { font-size:16px; padding:8px; }
+  #user-form { text-align:center; margin-top:40px; }
+  button { cursor:pointer; border-radius:6px; border:none; background:#1E90FF; color:#fff; padding:10px 14px; }
+  .quiz-body { margin-top:20px; }
+  .options label { display:block; border:1px solid #ddd; border-radius:8px; padding:10px; margin:8px 0; cursor:pointer; }
+  .options label:hover { background:#f0f4ff; border-color:#1e3a8a; }
+  .correct { background:#e8fce8 !important; border-color:green !important; }
+  .wrong { background:#ffe8e8 !important; border-color:red !important; }
+  .question-nav { display:flex; flex-wrap:nowrap; gap:6px; margin-bottom:15px; overflow-x:auto; padding-bottom:6px; }
+  .question-nav button { width:36px; height:36px; border-radius:50%; border:1px solid #ccc; background:#fff; color:#000; }
+  .question-nav button.active { border:2px solid #1b4332; }
+  .question-nav button.answered { background:#1b4332; color:#fff; }
+  .quiz-footer { display:flex; justify-content:space-between; margin-top:20px; position:fixed; left:0; right:0; bottom:8px; max-width:900px; margin-left:auto; margin-right:auto; padding:0 20px; box-sizing:border-box; }
+  .quiz-footer button { flex:1; margin:0 6px; padding:12px; border-radius:8px; }
+  #result-section { margin-top:20px; padding:15px; border-radius:8px; background:#f9f9f9; display:none; }
+  #timer { font-weight:700; color:#c0392b; }
+  .hidden { display:none; }
+  .topbar { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
 </style>
-
 </head>
 <body>
 
-<div id="login-box" class="container">
-  <h2>Enter Mobile Number</h2>
-  <input id="mobileInput" type="text" placeholder="Enter Registered Mobile Number">
-  <button onclick="verifyMobile()">Next</button>
+<div id="user-form" class="quiz-container">
+  <h3>Enter your registered mobile number to start</h3>
+  <input type="text" id="mobileInput" placeholder="Mobile number" />
+  <br/><br/>
+  <div id="after-mobile" class="hidden">
+    <p style="color:gray; font-size:14px;">Mobile verified. Please choose quiz.</p>
+  </div>
+  <button id="mobileNextBtn" onclick="verifyMobile()">Next</button>
 </div>
 
-<div id="quiz-select-box" class="container" style="display:none;">
-  <h2>Select Quiz</h2>
-  <select id="quizSelect"></select>
-  <button onclick="startQuiz()">Start Quiz</button>
-</div>
+<div id="quiz-area" class="quiz-container" style="display:none;">
+  <div class="quiz-body">
 
-<div id="quiz-box" class="container" style="display:none;">
-  <h3 id="qTitle"></h3>
-  <p id="qText"></p>
-  <div id="options"></div>
+    <div class="topbar" style="margin-bottom:12px;">
+      <div>
+        <select id="quizSelect"></select>
+        <button style="margin-left:8px;" onclick="startQuiz()">Start Quiz</button>
+      </div>
 
-  <div class="nav-buttons">
-    <button onclick="prevQ()">Previous</button>
-    <button onclick="submitQuiz()">Submit</button>
-    <button onclick="nextQ()">Next</button>
+      <div style="text-align:right;">
+        <div id="stats" style="font-size:14px;">
+          <span id="answered">Answered: 0</span> &nbsp;|&nbsp;
+          <span id="not-answered">Not answered: 0</span>
+        </div>
+        <div id="timer">00:00</div>
+      </div>
+    </div>
+
+    <div class="question-nav" id="question-nav"></div>
+
+    <div id="question-container"></div>
+
+    <div id="result-section"></div>
+
   </div>
 
-  <div id="result-box"></div>
+  <div class="quiz-footer">
+    <button onclick="prevQuestion()">Previous</button>
+    <button onclick="submitQuiz()" id="submitBtn">Submit</button>
+    <button onclick="nextQuestion()">Next</button>
+  </div>
 </div>
 
 <script>
-// ===================== CONFIG ========================
-const SHEET_JSON_URL =
-  "https://docs.google.com/spreadsheets/d/1qRFUQ_S_7pK_mb-cZb30CwcN6Gkb91A25Eq2JMefZNo/gviz/tq?tqx=out:json";
+/* ================= CONFIG ================= */
+const SHEET_JSON_URL = "https://docs.google.com/spreadsheets/d/1qRFUQ_S_7pK_mb-cZb30CwcN6Gkb91A25Eq2JMefZNo/gviz/tq?tqx=out:json";
 
-// 🔹 Predefined allowed mobile numbers  
+// Predefined allowed mobile numbers (edit as needed)
 const allowedMobiles = ["9876543210","6301186741","9999999999"];
 
-// 🔹 Google Form Settings (with your details)
+// Google Form settings (your provided form + entry ids)
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfVoWZdJJTPQhxRCzPhD7UkbMYt13d1pzeWkm7a8Tvbil1P5A/formResponse";
-
 const ENTRY_MOBILE  = "entry.1096987326";
 const ENTRY_QUIZ    = "entry.1993342463";
 const ENTRY_SCORE   = "entry.1053562570";
@@ -74,142 +100,310 @@ const ENTRY_CORRECT = "entry.1154826868";
 const ENTRY_WRONG   = "entry.1442969806";
 const ENTRY_SKIP    = "entry.770173959";
 
-// ===================== GLOBAL VARIABLES ========================
-let allRows = [];
-let selectedQuiz = "";
-let filteredQuestions = [];
-let answers = [];
+/* ================= STATE ================= */
+let allRows = [];               // all rows from sheet
+let quizNames = [];             // unique quiz names
+let questions = [];             // filtered questions for selected quiz
 let current = 0;
+let answers = [];               // chosen option index per question (null if none)
+let submitted = false;
 let userMobile = "";
+let timerTotal = 0;
+let timerInterval = null;
 
-// ============= LOAD QUESTIONS FROM SHEET ==================
-async function loadSheet() {
-  const res = await fetch(SHEET_JSON_URL);
-  let t = await res.text();
-  t = t.substring(t.indexOf("{"), t.lastIndexOf("}")+1);
-  const data = JSON.parse(t);
+/* ============== LOAD SHEET ================= */
+async function loadQuestionsFromSheet() {
+  try {
+    const res = await fetch(SHEET_JSON_URL);
+    let text = await res.text();
+    // extract JSON from Google visualization response
+    text = text.substring(text.indexOf("{"), text.lastIndexOf("}")+1);
+    const data = JSON.parse(text);
 
-  allRows = data.table.rows.map(r => ({
-    quiz: r.c[0]?.v || "",
-    q   : r.c[1]?.v || "",
-    opt : [r.c[2]?.v, r.c[3]?.v, r.c[4]?.v, r.c[5]?.v],
-    answerId : r.c[6]?.v
-  }));
+    // Map rows to objects (expected columns):
+    // [0] Quiz Name, [1] Question, [2] Option1, [3] Option2, [4] Option3, [5] Option4, [6] answerId
+    allRows = (data.table.rows || []).map(r => ({
+      quiz: r.c[0] ? r.c[0].v : "",
+      q:    r.c[1] ? r.c[1].v : "",
+      opts: [
+        r.c[2] ? r.c[2].v : "",
+        r.c[3] ? r.c[3].v : "",
+        r.c[4] ? r.c[4].v : "",
+        r.c[5] ? r.c[5].v : ""
+      ],
+      answerId: (r.c[6] && (r.c[6].v !== null && r.c[6].v !== undefined)) ? Number(r.c[6].v) : null
+    }));
 
-  loadQuizNames();
+    // Extract unique quiz names
+    const set = new Set();
+    allRows.forEach(row => { if(row.quiz) set.add(row.quiz); });
+    quizNames = Array.from(set);
+    populateQuizDropdown();
+  } catch (err) {
+    console.error("Failed to load sheet:", err);
+    alert("Failed to load questions. Check sheet URL and public access.");
+  }
 }
-loadSheet();
 
-// ============= Extract Quiz Names ==================
-function loadQuizNames() {
-  const set = new Set();
-  allRows.forEach(r => { if(r.quiz) set.add(r.quiz); });
-
+function populateQuizDropdown(){
   const sel = document.getElementById("quizSelect");
-  sel.innerHTML = [...set].map(q => `<option value="${q}">${q}</option>`).join("");
+  if(quizNames.length === 0){
+    sel.innerHTML = "<option value=''>No quizzes found</option>";
+    return;
+  }
+  sel.innerHTML = quizNames.map(q => `<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join("");
 }
 
-// ============= STEP 1: Verify Mobile ==================
-function verifyMobile() {
+/* ============= MOBILE VERIFICATION =========== */
+function verifyMobile(){
   const m = document.getElementById("mobileInput").value.trim();
-  if(!allowedMobiles.includes(m)) {
+  if(!m){
+    alert("Please enter mobile number");
+    return;
+  }
+  if(!allowedMobiles.includes(m)){
     alert("Not a registered mobile number");
     return;
   }
   userMobile = m;
-
-  document.getElementById("login-box").style.display      = "none";
-  document.getElementById("quiz-select-box").style.display= "block";
+  document.getElementById("user-form").style.display = "none";
+  document.getElementById("quiz-area").style.display = "block";
+  // keep quiz select visible; user chooses quiz and presses Start Quiz
 }
 
-// ============= STEP 2: Start Quiz ==================
-function startQuiz() {
-  selectedQuiz = document.getElementById("quizSelect").value;
+/* ============= START QUIZ =========== */
+function startQuiz(){
+  const selectedQuiz = document.getElementById("quizSelect").value;
+  if(!selectedQuiz){
+    alert("Please select a quiz");
+    return;
+  }
 
-  filteredQuestions = allRows.filter(r => r.quiz === selectedQuiz);
+  // Filter rows by quiz name and build question objects
+  questions = allRows.filter(r => r.quiz === selectedQuiz).map(r => ({
+    q: r.q,
+    options: r.opts,
+    answerId: (typeof r.answerId === 'number' ? r.answerId : null)
+  }));
 
-  answers = Array(filteredQuestions.length).fill(null);
+  if(questions.length === 0){
+    alert("No questions found for selected quiz");
+    return;
+  }
+
+  // initialize state
+  answers = Array(questions.length).fill(null);
   current = 0;
+  submitted = false;
 
-  document.getElementById("quiz-select-box").style.display = "none";
-  document.getElementById("quiz-box").style.display        = "block";
+  // timer: 60 secs per question
+  timerTotal = questions.length * 60;
+  startTimer();
 
-  loadQuestion();
+  renderNav();
+  renderQuestion();
+
+  // show initial stats
+  updateStats();
 }
 
-// ============= LOAD QUESTION ==================
-function loadQuestion() {
-  const q = filteredQuestions[current];
+/* ============= RENDER NAV =========== */
+function renderNav(){
+  const nav = document.getElementById("question-nav");
+  nav.innerHTML = "";
+  for(let i=0;i<questions.length;i++){
+    const btn = document.createElement("button");
+    btn.textContent = i+1;
+    btn.className = "";
+    if(i === current) btn.classList.add("active");
+    if(answers[i] !== null) btn.classList.add("answered");
+    btn.onclick = ()=>{ current = i; renderQuestion(); };
+    nav.appendChild(btn);
+  }
+}
 
-  document.getElementById("qTitle").innerText = 
-    `Question ${current+1} of ${filteredQuestions.length}`;
-  document.getElementById("qText").innerHTML  = q.q;
+/* ============= RENDER QUESTION =========== */
+function renderQuestion(){
+  const container = document.getElementById("question-container");
+  const qObj = questions[current];
 
-  let html = "";
-  q.opt.forEach((o,i) => {
-    html += `
-      <label class="option-label">
-        <input type="radio" name="opt" value="${i}" onchange="selectOpt(${i})">
-        ${o}
-      </label>
-    `;
+  // build options: radio at start of label
+  let html = `<h4>Question ${current+1} of ${questions.length}</h4>`;
+  html += `<p>${qObj.q}</p>`;
+  html += `<div class="options">`;
+  qObj.options.forEach((opt, idx) => {
+    // determine classes if submitted
+    let cls = "";
+    if(submitted){
+      if(qObj.answerId === idx) cls = "correct";
+      else if(answers[current] === idx && qObj.answerId !== idx) cls = "wrong";
+    }
+    // checked attribute for previously chosen
+    const checked = (answers[current] === idx) ? "checked" : "";
+    const disabled = submitted ? "disabled" : "";
+    html += `<label class="option-label ${cls}" data-opt-index="${idx}">
+               <input type="radio" name="opt" value="${idx}" ${checked} ${disabled} onchange="selectOpt(${idx})">
+               ${escapeHtml(opt)}
+             </label>`;
   });
+  html += `</div>`;
 
-  document.getElementById("options").innerHTML = html;
+  container.innerHTML = html;
+  renderNav();
+  updateStats();
+
+  // MathJax typeset for question content (if any formulas)
+  if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([container]);
 }
 
-function selectOpt(i) {
+/* ============= SELECT OPTION =========== */
+function selectOpt(i){
+  if(submitted) return;
   answers[current] = i;
+  renderNav();
 }
 
-// ============= Navigation ==================
-function nextQ(){ if(current < filteredQuestions.length-1){ current++; loadQuestion(); }}
-function prevQ(){ if(current > 0){ current--; loadQuestion(); }}
+/* ============= NAVIGATION =========== */
+function nextQuestion(){ if(current < questions.length -1){ current++; renderQuestion(); } }
+function prevQuestion(){ if(current > 0){ current--; renderQuestion(); } }
 
-// ============= Submit Quiz ==================
-function submitQuiz() {
+/* ============= STATS =========== */
+function updateStats(){
+  const ansCount = answers.filter(a => a !== null).length;
+  document.getElementById("answered").textContent = "Answered: " + ansCount;
+  document.getElementById("not-answered").textContent = "Not answered: " + (questions.length - ansCount);
+}
+
+/* ============= TIMER =========== */
+function startTimer(){
+  // initial render
+  updateTimerDisplay();
+  if(timerInterval) clearInterval(timerInterval);
+
+  timerInterval = setInterval(() => {
+    timerTotal--;
+    updateTimerDisplay();
+    if(timerTotal <= 0){
+      clearInterval(timerInterval);
+      // auto submit, no popup
+      submitQuiz();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(){
+  let m = Math.floor(timerTotal / 60);
+  let s = timerTotal % 60;
+  s = s < 10 ? '0'+s : s;
+  document.getElementById("timer").textContent = `${m}:${s}`;
+}
+
+/* ============= SUBMIT QUIZ =========== */
+function submitQuiz(){
+  if(submitted) return; // don't double submit
+  submitted = true;
+  if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+
+  // count results
   let correct = 0, wrong = 0;
-
-  filteredQuestions.forEach((q,i)=>{
-    if(answers[i] == null) return;
-    if(answers[i] == q.answerId) correct++;
+  for(let i=0;i<questions.length;i++){
+    const q = questions[i];
+    if(answers[i] === null) continue;
+    if(q.answerId !== null && answers[i] === q.answerId) correct++;
     else wrong++;
-  });
+  }
+  const skipped = questions.length - (correct + wrong);
+  const score = Math.round((correct / questions.length) * 100);
 
-  const skipped = filteredQuestions.length - (correct + wrong);
-  const score   = Math.round((correct / filteredQuestions.length) * 100);
+  // highlight for current and future renders — we will store classes by altering DOM labels across questions when user navigates
+  // Because we render one question at a time, we will compute classes during renderQuestion when submitted === true
 
-  document.getElementById("result-box").style.display = "block";
-  document.getElementById("result-box").innerHTML = `
-    <h3>Results</h3>
-    <p><b>Mobile:</b> ${userMobile}</p>
-    <p><b>Quiz:</b> ${selectedQuiz}</p>
-    <p><b>Score:</b> ${score}%</p>
-    <p><b>Correct:</b> ${correct}</p>
-    <p><b>Wrong:</b> ${wrong}</p>
-    <p><b>Skipped:</b> ${skipped}</p>
-  `;
+  // ensure all radio buttons disabled globally
+  setTimeout(() => { // small delay so renderQuestion can apply classes if currently displayed
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+  }, 0);
 
-  sendToGoogleSheet(userMobile, selectedQuiz, score, correct, wrong, skipped);
+  // Show result section (text exactly as requested)
+  const rs = document.getElementById("result-section");
+  rs.style.display = "block";
+  rs.innerHTML = `<h3>Submitted quiz successfully</h3>
+                  <p><b>Mobile:</b> ${escapeHtml(userMobile)}</p>
+                  <p><b>Quiz:</b> ${escapeHtml(document.getElementById("quizSelect").value)}</p>
+                  <p><b>Total Questions:</b> ${questions.length}</p>
+                  <p><b>Correct:</b> ${correct}</p>
+                  <p><b>Wrong:</b> ${wrong}</p>
+                  <p><b>Skipped:</b> ${skipped}</p>
+                  <p><b>Score:</b> ${score}%</p>`;
 
-  alert("Results submitted!");
+  // After marking submitted = true, re-render the currently visible question to show correct/wrong highlights
+  renderQuestion();
+
+  // send results to Google Form (no alerts)
+  sendResultsToForm(userMobile, document.getElementById("quizSelect").value, score, correct, wrong, skipped);
 }
 
-// ============= SEND RESULTS TO GOOGLE SHEET ==================
-function sendToGoogleSheet(mobile, quiz, score, correct, wrong, skipped) {
-  const fd = new FormData();
+/* ============= SEND RESULTS TO GOOGLE FORM =========== */
+function sendResultsToForm(mobile, quizName, score, correct, wrong, skipped) {
+  try {
+    const fd = new FormData();
+    fd.append(ENTRY_MOBILE, mobile);
+    fd.append(ENTRY_QUIZ, quizName);
+    fd.append(ENTRY_SCORE, String(score));
+    fd.append(ENTRY_CORRECT, String(correct));
+    fd.append(ENTRY_WRONG, String(wrong));
+    fd.append(ENTRY_SKIP, String(skipped));
 
-  fd.append(ENTRY_MOBILE,  mobile);
-  fd.append(ENTRY_QUIZ,    quiz);
-  fd.append(ENTRY_SCORE,   score);
-  fd.append(ENTRY_CORRECT, correct);
-  fd.append(ENTRY_WRONG,   wrong);
-  fd.append(ENTRY_SKIP,    skipped);
-
-  fetch(FORM_URL, { method: "POST", body: fd });
+    // fire-and-forget POST
+    fetch(FORM_URL, { method: 'POST', body: fd, mode: 'no-cors' }).catch(e => {
+      // network failures are silently ignored; form will still record when reachable
+      console.warn("Form submit error (expected in no-cors):", e);
+    });
+  } catch (e){
+    console.error("Error sending results:", e);
+  }
 }
+
+/* ============= UTILS =========== */
+function escapeHtml(str){
+  if(!str && str !== 0) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/* When questions are rendered after submission, ensure correct/wrong classes applied to labels */
+(function enhanceRenderAfterSubmit(){
+  // wrap original renderQuestion to add label class adjustments after DOM update
+  const origRender = renderQuestion;
+  renderQuestion = function(){
+    origRender();
+    // apply classes when submitted
+    if(submitted){
+      // current question DOM labels
+      const qObj = questions[current];
+      const labels = Array.from(document.querySelectorAll("#question-container .options .option-label"));
+      // clear previous classes first
+      labels.forEach(l => { l.classList.remove("correct","wrong"); });
+      // mark correct label (if known)
+      if(qObj.answerId !== null && labels[qObj.answerId]) labels[qObj.answerId].classList.add("correct");
+      // mark wrong selected (if any)
+      if(answers[current] !== null && qObj.answerId !== null && answers[current] !== qObj.answerId && labels[answers[current]]) {
+        labels[answers[current]].classList.add("wrong");
+      }
+      // disable radios in this question (they may be enabled on other question renders)
+      labels.forEach(l => {
+        const rb = l.querySelector('input[type="radio"]');
+        if(rb) rb.disabled = true;
+      });
+    }
+  };
+})();
+
+/* ============= INITIAL LOAD =========== */
+loadQuestionsFromSheet();
 
 </script>
-
 </body>
 </html>
