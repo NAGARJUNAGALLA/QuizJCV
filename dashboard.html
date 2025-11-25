@@ -37,13 +37,33 @@
     .block:active {
         transform: scale(0.95);
     }
+    /* HEADER */
+.quiz-header {
+  background-color: #1b4332;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  font-weight: 600;
+  font-size: 18px;
+  position: fixed;
+  top: 0;
+  left:0;
+  right:0;
+  z-index: 10;
+}
     /* Bottom Navigation */
 .navbar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: white;
+  background: 1b4332;
   display: flex;
   justify-content: space-around;
   padding: 10px;
@@ -63,6 +83,11 @@
 
 </head>
 <body>
+    <div class="quiz-header">
+    <div id="quiz-title">Quiz</div>
+    <div>⏱️ <span id="timer"></span></div>
+    <i class="fa-solid fa-expand full-icon" title="Fullscreen" onclick="toggleFullscreen()"></i>
+  </div>
 
 <div class="container" id="blockContainer"></div>
 <!-- Bottom Navigation -->
