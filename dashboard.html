@@ -37,12 +37,42 @@
     .block:active {
         transform: scale(0.95);
     }
+    /* Bottom Navigation */
+.navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.nav-item {
+  text-align: center;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  opacity: 0.7;
+}
 </style>
 
 </head>
 <body>
 
 <div class="container" id="blockContainer"></div>
+<!-- Bottom Navigation -->
+<div class="navbar">
+  <div class="nav-item" onclick="goHome()">🏠<br>Home</div>
+  <div class="nav-item" onclick="goLibrary()">📘<br>Library</div>
+  <div class="nav-item">📝<br>Exams</div>
+  <div class="nav-item">🖥️<br>Online</div>
+  <div class="nav-item">💳<br>Fee</div>
+</div>    
 
 <script>
 const blocks = [
@@ -82,6 +112,9 @@ blocks.forEach(block => {
 
     container.appendChild(div);
 });
+    // Bottom navbar
+function goHome() { window.location.href = "dashboard.html"; }
+function goLibrary() { window.location.href = "library.html"; }
 </script>
 
 </body>
