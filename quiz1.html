@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1, user-scalable=no">
+<title>Multi-Quiz App</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body { margin:0; font-family: 'Segoe UI', sans-serif; background:#eef2f7; }
+.container { max-width:800px; margin:0 auto; padding:20px; }
+
+h2,h3 { text-align:center; color:#1E90FF; }
+
+input, select, button { font-size:16px; padding:10px; border-radius:6px; border:1px solid #ccc; width:90%; }
+
+button { cursor:pointer; background:#1E90FF; color:white; border:none; margin-top:10px; }
+
+.option-label { display:block; padding:10px; margin-top:10px; border-radius:6px; border:1px solid #ccc; }
+
+.correct { background:#d4ffd4; border-color:green; }
+.wrong   { background:#ffd4d4; border-color:red; }
+
+.nav-buttons { display:flex; justify-content:space-between; margin-top:20px; }
+.nav-buttons button { width:32%; }
+
+#result-box { background:white; padding:15px; border-radius:6px; display:none; }
+</style>
+
+</head>
+<body>
+
+<div id="login-box" class="container">
+  <h2>Enter Mobile Number</h2>
+  <input id="mobileInput" type="text" placeholder="Enter Registered Mobile Number">
+  <button onclick="verifyMobile()">Next</button>
+</div>
+
+<div id="quiz-select-box" class="container" style="display:none;">
+  <h2>Select Quiz</h2>
+  <select id="quizSelect"></select>
+  <button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<div id="quiz-box" class="container" style="display:none;">
+  <h3 id="qTitle"></h3>
+  <p id="qText"></p>
+  <div id="options"></div>
+
+  <div class="nav-buttons">
+    <button onclick="prevQ()">Previous</button>
+    <button onclick="submitQuiz()">Submit</button>
+    <button onclick="nextQ()">Next</button>
+  </div>
+
+  <div id="result-box"></div>
+</div>
+
+<script>
+// ===================== CONFIG ========================
+const SHEET_JSON_URL =
+  "https://docs.google.com/spreadsheets/d/1qRFUQ_S_7pK_mb-cZb30CwcN6Gkb91A25Eq2JMefZNo/gviz/tq?tqx=out:json";
+
+// 🔹 Predefined allowed mobile numbers  
+const allowedMobiles = ["9876543210","6301186741","9999999999"];
+
+// 🔹 Google Form Settings (with your details)
+const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfVoWZdJJTPQhxRCzPhD7UkbMYt13d1pzeWkm7a8Tvbil1P5A/formResponse";
+
+const ENTRY_MOBILE  = "entry.1096987326";
+const ENTRY_QUIZ    = "entry.1993342463";
+const ENTRY_SCORE   = "entry.1053562570";
+const ENTRY_CORRECT = "entry.1154826868";
+const ENTRY_WRONG   = "entry.1442969806";
+const ENTRY_SKIP    = "entry.770173959";
+
+// ===================== GLOBAL VARIABLES ========================
+let allRows = [];
+let selectedQuiz = "";
+let filteredQuestions = [];
+let answers = [];
+let current = 0;
+let userMobile = "";
+
+// ============= LOAD QUESTIONS FROM SHEET ==================
+async function loadSheet() {
+  const res = await fetch(SHEET_JSON_URL);
+  let t = await res.text();
+  t = t.substring(t.indexOf("{"), t.lastIndexOf("}")+1);
+  const data = JSON.parse(t);
+
+  allRows = data.table.rows.map(r => ({
+    quiz: r.c[0]?.v || "",
+    q   : r.c[1]?.v || "",
+    opt : [r.c[2]?.v, r.c[3]?.v, r.c[4]?.v, r.c[5]?.v],
+    answerId : r.c[6]?.v
+  }));
+
+  loadQuizNames();
+}
+loadSheet();
+
+// ============= Extract Quiz Names ==================
+function loadQuizNames() {
+  const set = new Set();
+  allRows.forEach(r => { if(r.quiz) set.add(r.quiz); });
+
+  const sel = document.getElementById("quizSelect");
+  sel.innerHTML = [...set].map(q => `<option value="${q}">${q}</option>`).join("");
+}
+
+// ============= STEP 1: Verify Mobile ==================
+function verifyMobile() {
+  const m = document.getElementById("mobileInput").value.trim();
+  if(!allowedMobiles.includes(m)) {
+    alert("Not a registered mobile number");
+    return;
+  }
+  userMobile = m;
+
+  document.getElementById("login-box").style.display      = "none";
+  document.getElementById("quiz-select-box").style.display= "block";
+}
+
+// ============= STEP 2: Start Quiz ==================
+function startQuiz() {
+  selectedQuiz = document.getElementById("quizSelect").value;
+
+  filteredQuestions = allRows.filter(r => r.quiz === selectedQuiz);
+
+  answers = Array(filteredQuestions.length).fill(null);
+  current = 0;
+
+  document.getElementById("quiz-select-box").style.display = "none";
+  document.getElementById("quiz-box").style.display        = "block";
+
+  loadQuestion();
+}
+
+// ============= LOAD QUESTION ==================
+function loadQuestion() {
+  const q = filteredQuestions[current];
+
+  document.getElementById("qTitle").innerText = 
+    `Question ${current+1} of ${filteredQuestions.length}`;
+  document.getElementById("qText").innerHTML  = q.q;
+
+  let html = "";
+  q.opt.forEach((o,i) => {
+    html += `
+      <label class="option-label">
+        <input type="radio" name="opt" value="${i}" onchange="selectOpt(${i})">
+        ${o}
+      </label>
+    `;
+  });
+
+  document.getElementById("options").innerHTML = html;
+}
+
+function selectOpt(i) {
+  answers[current] = i;
+}
+
+// ============= Navigation ==================
+function nextQ(){ if(current < filteredQuestions.length-1){ current++; loadQuestion(); }}
+function prevQ(){ if(current > 0){ current--; loadQuestion(); }}
+
+// ============= Submit Quiz ==================
+function submitQuiz() {
+  let correct = 0, wrong = 0;
+
+  filteredQuestions.forEach((q,i)=>{
+    if(answers[i] == null) return;
+    if(answers[i] == q.answerId) correct++;
+    else wrong++;
+  });
+
+  const skipped = filteredQuestions.length - (correct + wrong);
+  const score   = Math.round((correct / filteredQuestions.length) * 100);
+
+  document.getElementById("result-box").style.display = "block";
+  document.getElementById("result-box").innerHTML = `
+    <h3>Results</h3>
+    <p><b>Mobile:</b> ${userMobile}</p>
+    <p><b>Quiz:</b> ${selectedQuiz}</p>
+    <p><b>Score:</b> ${score}%</p>
+    <p><b>Correct:</b> ${correct}</p>
+    <p><b>Wrong:</b> ${wrong}</p>
+    <p><b>Skipped:</b> ${skipped}</p>
+  `;
+
+  sendToGoogleSheet(userMobile, selectedQuiz, score, correct, wrong, skipped);
+
+  alert("Results submitted!");
+}
+
+// ============= SEND RESULTS TO GOOGLE SHEET ==================
+function sendToGoogleSheet(mobile, quiz, score, correct, wrong, skipped) {
+  const fd = new FormData();
+
+  fd.append(ENTRY_MOBILE,  mobile);
+  fd.append(ENTRY_QUIZ,    quiz);
+  fd.append(ENTRY_SCORE,   score);
+  fd.append(ENTRY_CORRECT, correct);
+  fd.append(ENTRY_WRONG,   wrong);
+  fd.append(ENTRY_SKIP,    skipped);
+
+  fetch(FORM_URL, { method: "POST", body: fd });
+}
+
+</script>
+
+</body>
+</html>
