@@ -1,79 +1,155 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GitHub Video Player</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>YouTube Style Player</title>
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
-        padding: 20px;
-    }
-    h2 {
-        text-align: center;
-        margin-bottom: 10px;
-    }
-    video {
-        width: 100%;
-        border-radius: 10px;
-        background: black;
-        margin-bottom: 20px;
-    }
-    .btn {
-        width: 100%;
-        background: #1e3e8e;
-        color: white;
-        padding: 14px;
-        border: none;
-        margin: 8px 0;
-        font-size: 18px;
-        border-radius: 8px;
-        text-align: left;
-    }
-    .btn:hover {
-        background: #335edb;
-    }
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f3f3f3;
+}
+
+/* Video Player */
+#videoContainer {
+  width: 100%;
+  background: black;
+}
+#mainVideo {
+  width: 100%;
+  max-height: 260px;
+}
+
+/* Title */
+#videoTitle {
+  padding: 12px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Next Videos List */
+#nextList {
+  padding: 10px;
+}
+
+.video-item {
+  background: #fff;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  display: flex;
+  cursor: pointer;
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.thumbnail {
+  width: 120px;
+  height: 70px;
+  background: #ccc;
+  border-radius: 6px;
+}
+
+.details {
+  padding-left: 10px;
+}
+
+.details h4 {
+  margin: 0;
+  font-size: 16px;
+}
+.details p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #666;
+}
 </style>
 </head>
 
 <body>
 
-<h2>GitHub Video Player</h2>
+<!-- Top Video Player -->
+<div id="videoContainer">
+  <video id="mainVideo" controls controlsList="nodownload" allowfullscreen></video>
+</div>
 
-<!-- Video Player on TOP -->
-<video id="videoPlayer" controls controlsList="nodownload" playsinline
-       webkit-playsinline
-       allowfullscreen></video>
+<div id="videoTitle">Video Title</div>
 
-<div id="buttonsContainer"></div>
+<!-- Next Videos -->
+<h3 style="padding-left:10px;">Next Videos</h3>
+<div id="nextList"></div>
 
 <script>
-    // Add videos from any GitHub repository
-    const videoList = [
-        { title: "2 Letter Words", url: "https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/2letterwords.mp4" },
-        { title: "Lesson 1 (Repo 2)", url: "https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/3letterwords.mp4" },
-        { title: "Chapter 3 (Repo 3)", url: "https://raw.githubusercontent.com/USERNAME3/REPO3/main/chapter3.mp4" }
-    ];
 
-    const container = document.getElementById("buttonsContainer");
+// ------------------------------------------
+// Your GitHub video playlist
+// ------------------------------------------
+let videos = [
+  {
+    title: "2 LETTER WORDS",
+    url: "https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/2letterwords.mp4",
+    thumb: "THUMBNAIL_URL_1"
+  },
+  {
+    title: "3 LETTER WORDS",
+    url: "https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/3letterwords.mp4",
+    thumb: "THUMBNAIL_URL_2"
+  },
+  {
+    title: "Chapter 1 - Part 2",
+    url: "RAW_LINK_3",
+    thumb: "THUMBNAIL_URL_3"
+  },
+  {
+    title: "Chapter 2 - Introduction",
+    url: "RAW_LINK_4",
+    thumb: "THUMBNAIL_URL_4"
+  }
+];
 
-    // Create buttons
-    videoList.forEach(v => {
-        let btn = document.createElement("button");
-        btn.className = "btn";
-        btn.innerText = v.title;
-        btn.onclick = () => playVideo(v.url);
-        container.appendChild(btn);
-    });
+// ------------------------------------------
+// Load First Video
+// ------------------------------------------
+const main = document.getElementById("mainVideo");
+const title = document.getElementById("videoTitle");
+const list = document.getElementById("nextList");
 
-    function playVideo(url) {
-        const player = document.getElementById("videoPlayer");
-        player.src = url;
-        player.play();
+function loadVideo(index) {
+  main.src = videos[index].url;
+  title.innerText = videos[index].title;
+  main.play();
+
+  // refresh Next Videos
+  loadNextVideos(index);
+}
+
+function loadNextVideos(currentIndex) {
+  list.innerHTML = "";
+
+  videos.forEach((v, idx) => {
+    if (idx !== currentIndex) {
+      let box = document.createElement("div");
+      box.className = "video-item";
+
+      box.onclick = () => loadVideo(idx);
+
+      box.innerHTML = `
+        <img class="thumbnail" src="${v.thumb}">
+        <div class="details">
+          <h4>${v.title}</h4>
+          <p>Video Lesson</p>
+        </div>
+      `;
+
+      list.appendChild(box);
     }
-</script>
+  });
+}
 
+// Load first video initially
+loadVideo(0);
+
+</script>
 </body>
 </html>
