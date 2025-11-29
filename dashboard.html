@@ -148,7 +148,7 @@
   <div class="nav-item" onclick="goHome()">🏠<br>Home</div>
   <div class="nav-item" onclick="goLibrary()">📘<br>Library</div>
   <div class="nav-item">📝<br>Exams</div>
-  <div class="nav-item">🖥️<br>Online</div>
+  <div class="nav-item" onclick="goVideo()">🖥️<br>Online Classes</div>
   <div class="nav-item">💳<br>Fee</div>
 </div>    
 
@@ -160,7 +160,7 @@ const blocks = [
     { title: "Previous Papers", color: "#9C27B0", htmlFile: "previouspapers.html" },
     { title: "Online Tests", color: "#4CAF50", htmlFile: "library.html" },
     { title: "Formulas", color: "#CDDC39", htmlFile: "videocreator.html" },
-    { title: "Syllabus", color: "#9E9E9E", htmlFile: "syllabus.html" },
+    { title: "Online Classes", color: "#9E9E9E", htmlFile: "video.html" },
 ];
 
 // Populate main blocks
@@ -199,6 +199,7 @@ function toggleNav() {
 // Bottom navbar functions
 function goHome() { window.location.href = "dashboard.html"; }
 function goLibrary() { window.location.href = "library.html"; }
+function goVideo() { window.location.href="video.html";}
 </script>
 
 </body>
