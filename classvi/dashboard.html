@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JCV ICE App Layout</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f6fb;
+    }
+
+    /* Header */
+    .header {
+        background: linear-gradient(90deg, #1e3e8e, #3559c7);
+        color: white;
+        padding: 18px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+    }
+
+    /* Toggle button */
+    .toggle-btn {
+        position: absolute;
+        top: 22px;
+        left: 15px;
+        font-size: 26px;
+        color: white;
+        cursor: pointer;
+    }
+
+    /* Side Navigation */
+    .sidenav {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 2000;
+        top: 0;
+        left: 0;
+        background-color: #1e3e8e;
+        overflow-x: hidden;
+        transition: 0.4s;
+        padding-top: 60px;
+    }
+
+    .sidenav a {
+        padding: 12px 20px;
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        display: block;
+        margin-bottom: 5px;
+        transition: 0.2s;
+    }
+
+    .sidenav a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+    }
+
+    .closebtn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 26px;
+        color: white;
+        cursor: pointer;
+    }
+
+    /* Slideshow */
+    .slideshow-container {
+        margin-top: 80px;
+        width: 100%;
+        position: relative;
+    }
+
+    .slide {
+        display: none;
+        width: 100%;
+    }
+
+    .slide img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    /* Blocks */
+    .container {
+        padding: 10px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 80px;
+    }
+
+    .block {
+        background: linear-gradient(135deg, #1e3e8e, #3559c7);
+        padding: 20px;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 14px;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        transition: 0.2s;
+    }
+
+    .block:hover {
+        transform: scale(1.04);
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px;
+        background: white;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        box-shadow: 0 -3px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    .bottom-nav button {
+        background: none;
+        border: none;
+        font-size: 16px;
+        font-weight: bold;
+        color: #1e3e8e;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <span class="toggle-btn" onclick="openNav()">☰</span>
+    JCV ICE
+</div>
+
+<!-- Side Navigation -->
+<div id="mySidenav" class="sidenav">
+    <span class="closebtn" onclick="closeNav()">×</span>
+
+    <a href="classes.html" onclick="closeNav()">Classes</a>
+    <a href="videos.html" onclick="closeNav()">Video Lessons</a>
+    <a href="tests.html" onclick="closeNav()">Tests</a>
+    <a href="materials.html" onclick="closeNav()">Materials</a>
+    <a href="results.html" onclick="closeNav()">Results</a>
+    <a href="contact.html" onclick="closeNav()">Contact</a>
+</div>
+
+<!-- Slideshow -->
+<div class="slideshow-container">
+
+    <div class="slide">
+        <img src="https://via.placeholder.com/800x300?text=JCV+ICE+Banner+1">
+    </div>
+
+    <div class="slide">
+        <img src="https://via.placeholder.com/800x300?text=JCV+ICE+Banner+2">
+    </div>
+
+    <div class="slide">
+        <img src="https://via.placeholder.com/800x300?text=JCV+ICE+Banner+3">
+    </div>
+
+</div>
+
+<!-- Body Blocks -->
+<div class="container">
+    <div class="block" onclick="location.href='classes.html'">Classes</div>
+    <div class="block" onclick="location.href='videos.html'">Videos</div>
+    <div class="block" onclick="location.href='tests.html'">Tests</div>
+    <div class="block" onclick="location.href='materials.html'">Materials</div>
+    <div class="block" onclick="location.href='results.html'">Results</div>
+    <div class="block" onclick="location.href='contact.html'">Contact</div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <button onclick="location.href='index.html'">🏠 Home</button>
+    <button onclick="location.href='courses.html'">📘 Courses</button>
+</div>
+
+<script>
+function openNav() {
+    document.getElementById("mySidenav").style.width = "260px";
+}
+
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+}
+
+/* Slideshow */
+let slideIndex = 0;
+showSlides();
+
+function showSlides() {
+    let i;
+    let slides = document.getElementsByClassName("slide");
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+    }
+    slideIndex++;
+    if (slideIndex > slides.length) { slideIndex = 1; }
+    slides[slideIndex - 1].style.display = "block";
+    setTimeout(showSlides, 2500); // Change image every 2.5 seconds
+}
+</script>
+
+</body>
+</html>
