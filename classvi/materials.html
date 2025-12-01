@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Images — JCV ICE</title>
+  <style>
+    :root{
+      --brand:#1e3e8e;
+      --brand-2:#0f2a6b;
+      --glass: rgba(255,255,255,0.06);
+      --text:#ffffff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, system-ui, Arial, sans-serif;background:linear-gradient(180deg,#f6f8ff,#eef4ff);color:#0b1220;min-height:100vh;display:flex;flex-direction:column}
+
+    /* Top header */
+    header.app-header{
+      background: linear-gradient(90deg,var(--brand),var(--brand-2));
+      color:var(--text);
+      padding:18px 16px;
+      display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;box-shadow:0 6px 18px rgba(30,62,142,0.12)
+    }
+    header .brand{
+      display:flex;align-items:center;gap:12px;font-weight:700;font-size:18px
+    }
+    header .brand .logo{
+      width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.06));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px
+    }
+    header .search{margin-left:auto}
+
+    main{padding:14px;flex:1;max-width:1100px;margin:0 auto;width:100%}
+
+    /* slideshow */
+    .slideshow{
+      width:100%;height:220px;border-radius:12px;overflow:hidden;position:relative;background:linear-gradient(180deg,rgba(0,0,0,0.06),transparent);box-shadow:0 6px 20px rgba(16,24,40,0.06)
+    }
+    .slides{display:flex;transition:transform .5s ease}
+    .slide{min-width:100%;height:220px;background-size:cover;background-position:center}
+    .dots{position:absolute;left:12px;bottom:12px;display:flex;gap:8px}
+    .dot{width:10px;height:10px;border-radius:10px;background:rgba(255,255,255,0.6);cursor:pointer}
+    .dot.active{background:var(--brand)}
+
+    /* image grid */
+    .grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px}
+    .card{background:var(--text);border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(16,24,40,0.06);cursor:pointer}
+    .card img{width:100%;display:block;height:auto;object-fit:contain}
+    .card .caption{padding:10px;font-size:14px}
+
+    /* bottom nav */
+    nav.bottom-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:linear-gradient(90deg,var(--brand),var(--brand-2));width:calc(100% - 40px);max-width:540px;border-radius:999px;padding:8px 10px;display:flex;gap:8px;justify-content:space-between;box-shadow:0 12px 30px rgba(30,62,142,0.18);z-index:40}
+    nav.bottom-nav button{flex:1;background:transparent;border:0;color:var(--text);font-weight:600;padding:10px;border-radius:999px;cursor:pointer}
+    nav.bottom-nav button:active{transform:scale(.995)}
+
+    /* modal */
+    .modal{position:fixed;inset:0;background:rgba(8,12,20,0.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:60}
+    .modal.open{display:flex}
+    .modal .panel{background:#fff;border-radius:10px;max-width:900px;width:100%;overflow:hidden}
+    .modal .panel img{width:100%;height:60vh;object-fit:contain;background:#000}
+    .modal .toolbar{display:flex;justify-content:flex-end;padding:8px}
+    .btn{background:var(--brand);color:var(--text);border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
+
+    @media(min-width:800px){
+      .slideshow{height:320px}
+      .slide{height:320px}
+      .card img{height:180px}
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo">J</div>
+      <div>
+        <div style="font-size:14px;opacity:.95">JCV ICE</div>
+        <div style="font-size:12px;opacity:.85">Images</div>
+      </div>
+    </div>
+    <div class="search" aria-hidden>
+      <!-- placeholder for future search -->
+    </div>
+  </header>
+
+  <main>
+   <!-- <section class="slideshow" aria-label="image slideshow">
+      <div class="slides" id="slides">
+        <div class="slide" style="background-image:url('https://picsum.photos/id/1018/1200/800')"></div>
+        <div class="slide" style="background-image:url('https://picsum.photos/id/1025/1200/800')"></div>
+        <div class="slide" style="background-image:url('https://picsum.photos/id/1035/1200/800')"></div>
+      </div>
+      <div class="dots" id="dots"></div>
+    </section>-->
+
+    <div class="grid" id="gallery">
+      <!-- image cards -->
+    </div>
+  </main>
+
+  <nav class="bottom-nav" role="navigation">
+    <button id="btnHome" title="Home">🏠 Home</button>
+    <button id="btnMaterial" title="Material">📚 Material</button>
+  </nav>
+
+  <!-- modal preview -->
+  <div class="modal" id="modal">
+    <div class="panel">
+      <div class="toolbar"><button class="btn" id="closeModal">Close</button></div>
+      <img id="modalImage" src="" alt="Preview" />
+    </div>
+  </div>
+
+  <script>
+    // navigation targets (change to your actual pages)
+    document.getElementById('btnHome').addEventListener('click', ()=>{ window.location.href = 'home.html'; });
+    document.getElementById('btnMaterial').addEventListener('click', ()=>{ window.location.href = 'material.html'; });
+
+    // slideshow logic
+    const slides = document.getElementById('slides');
+    const dots = document.getElementById('dots');
+    const slideCount = slides.children.length;
+    let idx = 0;
+
+    for(let i=0;i<slideCount;i++){
+      const d = document.createElement('div'); d.className='dot'; d.dataset.i = i; dots.appendChild(d);
+      d.addEventListener('click', ()=>{ idx = i; update(); });
+    }
+
+    const dotEls = dots.children;
+    function update(){
+      slides.style.transform = `translateX(${-idx*100}%)`;
+      for(let j=0;j<dotEls.length;j++){ dotEls[j].classList.toggle('active', j==idx); }
+    }
+    update();
+    setInterval(()=>{ idx = (idx+1)%slideCount; update(); },4000);
+
+    // gallery images (sample images; replace with your own)
+    const images = [
+      'https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/4thTeluguLesson1_1.jpg',
+      'https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/4thTeluguLesson1_2.jpg',
+      'https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/4thTeluguLesson1_3.jpg',
+      'https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/4thTeluguLesson1_4.jpg',
+      'https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/4thTeluguLesson1_5.jpg',
+      'https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/4thTeluguLesson1_6.jpg',
+  
+    ];
+
+    const gallery = document.getElementById('gallery');
+    images.forEach((src, i)=>{
+      const card = document.createElement('div'); card.className='card';
+      const img = document.createElement('img'); img.src = src; img.alt = `Image ${i+1}`;
+      const caption = document.createElement('div'); caption.className='caption'; caption.textContent = `Image ${i+1}`;
+      card.appendChild(img); card.appendChild(caption);
+      card.addEventListener('click', ()=>openModal(src));
+      gallery.appendChild(card);
+    });
+
+    // modal
+    const modal = document.getElementById('modal');
+    const modalImage = document.getElementById('modalImage');
+    const closeModal = document.getElementById('closeModal');
+    function openModal(src){ modalImage.src = src; modal.classList.add('open'); }
+    closeModal.addEventListener('click', ()=>{ modal.classList.remove('open'); modalImage.src = ''; });
+    modal.addEventListener('click',(e)=>{ if(e.target===modal) { modal.classList.remove('open'); modalImage.src=''; } });
+  </script>
+</body>
+</html>
