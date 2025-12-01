@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Online Classes App - Login Flow</title>
+<style>
+  body {margin: 0; font-family: Arial; background: #f2f5fb; color: #222;}
+  .screen {display: none; padding: 20px;}
+  .active {display: block;}
+  .card {background: #fff; padding: 20px; border-radius: 12px; max-width: 350px; margin: 60px auto; box-shadow: 0 4px 16px rgba(0,0,0,0.1);}
+  h2 {text-align: center; margin-top: 0;}
+  select, input {width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px;}
+  button {width: 100%; padding: 12px; margin-top: 16px; border-radius: 8px; border: none; background: #1e63d6; font-size: 16px; color: #fff; font-weight: bold; cursor: pointer;}
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1 : SELECT CLASS -->
+<div id="classScreen" class="screen active">
+  <div class="card">
+    <h2>Select Class</h2>
+    <select id="classSelect">
+      <option value="">-- Select Class --</option>
+      <option value="class6">Class 6</option>
+      <option value="class7">Class 7</option>
+      <option value="class8">Class 8</option>
+      <option value="class9">Class 9</option>
+      <option value="class10">Class 10</option>
+    </select>
+    <button onclick="goToLogin()">Next</button>
+  </div>
+</div>
+
+<!-- SCREEN 2 : LOGIN SCREEN -->
+<div id="loginScreen" class="screen">
+  <div class="card">
+    <h2>Login</h2>
+    <input type="text" id="mobileInput" placeholder="Enter mobile number" maxlength="10" />
+    <button onclick="loginUser()">Login</button>
+    <p id="errorMsg" style="color:red;text-align:center;margin-top:10px;display:none">Incorrect mobile number</p>
+  </div>
+</div>
+
+<script>
+
+// STUDENT LIST — MULTIPLE NUMBERS FOR SAME CLASS PAGE
+const classPages = {
+  class6: ["9000000001", "9000000002", "9000000003", "9000000004", "9000000005"],
+  class7: ["9111111111", "9111111112", "9111111113", "9111111114", "9111111115", "9111111116"],
+  class8: ["9222222221", "9222222222", "9222222223"],
+  class9: ["9333333331", "9333333332", "9333333333", "9333333334"],
+  class10: ["9444444441", "9444444442", "9444444443"]
+};
+
+// PAGE FILES FOR EACH CLASS
+const pageLinks = {
+  class6: "classvi/dashboard.html",
+  class7: "class7.html",
+  class8: "class8.html",
+  class9: "class9.html",
+  class10: "class10.html"
+};
+
+let selectedClass = "";
+
+function goToLogin() {
+  selectedClass = document.getElementById("classSelect").value;
+
+  if (!selectedClass) {
+    alert("Please select a class");
+    return;
+  }
+
+  document.getElementById("classScreen").classList.remove("active");
+  document.getElementById("loginScreen").classList.add("active");
+}
+
+function loginUser() {
+  const mobile = document.getElementById("mobileInput").value.trim();
+
+  if (!selectedClass) return;
+
+  // Check if mobile exists in selected class list
+  if (classPages[selectedClass].includes(mobile)) {
+    window.location.href = pageLinks[selectedClass];
+  } else {
+    document.getElementById("errorMsg").style.display = "block";
+  }
+}
+</script>
+
+</body>
+</html>
