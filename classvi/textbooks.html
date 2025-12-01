@@ -83,38 +83,34 @@
 
   <div class="subject" onclick="toggleChapters('telugu')">TELUGU</div>
   <div id="telugu" class="chapters">
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/NAGARJUNAGALLA/Video/main/classic/telugulesson1.pdf')">గాంధీ మహాత్ముడు</a>
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/telugu_ch2.pdf')">Chapter 2</a>
+    <a href="#" onclick="openPdf('https://github.com/NAGARJUNAGALLA/Video/raw/main/telugulesson41.pdf')">1) గాంధీ మహాత్ముడు</a>
+   <a href="#" onclick="openPdf('https://github.com/NAGARJUNAGALLA/Video/raw/main/telugulesson42.pdf')">2) గోపాల్ తెలివి</a>
+   <a href="#" onclick="openPdf('https://github.com/NAGARJUNAGALLA/Video/raw/main/telugulesson43.pdf')">3) గాంధీ మహాత్ముడు</a>
   </div>
 
   <div class="subject" onclick="toggleChapters('english')">ENGLISH</div>
   <div id="english" class="chapters">
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/english_unit1.pdf')">Unit 1</a>
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/english_unit2.pdf')">Unit 2</a>
+    <a href="#" onclick="openPdf('https://github.com/NAGARJUNAGALLA/Video/raw/main/english1.pdf')">Unit 1</a>
   </div>
 
   <div class="subject" onclick="toggleChapters('maths')">MATHS</div>
   <div id="maths" class="chapters">
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/maths_ch1.pdf')">Chapter 1</a>
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/maths_ch2.pdf')">Chapter 2</a>
+    <a href="#" onclick="openPdf('https://github.com/NAGARJUNAGALLA/Video/raw/main/maths1.pdf')">Chapter 1</a>
   </div>
 
   <div class="subject" onclick="toggleChapters('science')">SCIENCE</div>
   <div id="science" class="chapters">
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/science_ch1.pdf')">Chapter 1</a>
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/science_ch2.pdf')">Chapter 2</a>
+    <a href="#" onclick="openPdf('https://github.com/NAGARJUNAGALLA/Video/raw/main/science1.pdf')">Chapter 1</a>
   </div>
 
   <div class="subject" onclick="toggleChapters('social')">SOCIAL</div>
   <div id="social" class="chapters">
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/social_ch1.pdf')">Chapter 1</a>
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/social_ch2.pdf')">Chapter 2</a>
+    <a href="#" onclick="openPdf('https://github.com/NAGARJUNAGALLA/Video/raw/main/social1.pdf')">Chapter 1</a>
   </div>
 
   <div class="subject" onclick="toggleChapters('hindi')">HINDI</div>
   <div id="hindi" class="chapters">
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/hindi_ch1.pdf')">Chapter 1</a>
-    <a href="#" onclick="openPdf('https://raw.githubusercontent.com/username/repo/main/hindi_ch2.pdf')">Chapter 2</a>
+    <a href="#" onclick="openPdf('https://github.com/NAGARJUNAGALLA/Video/raw/main/hindi1.pdf')">Chapter 1</a>
   </div>
 
 </div>
@@ -129,10 +125,13 @@ function toggleChapters(id){
   var box=document.getElementById(id);
   box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
+
 function openPdf(link){
-  document.getElementById('pdfViewer').src=link;
+  const viewerLink = 'https://drive.google.com/viewerng/viewer?embedded=true&url=' + encodeURIComponent(link);
+  document.getElementById('pdfViewer').src = viewerLink;
   document.getElementById('pdfViewerBox').style.display='flex';
 }
+
 function closePdf(){
   document.getElementById('pdfViewerBox').style.display='none';
   document.getElementById('pdfViewer').src='';
