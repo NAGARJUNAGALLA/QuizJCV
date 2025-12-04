@@ -96,15 +96,20 @@ button{width:100%;padding:12px;background:#003A8C;color:#fff;border:0;border-rad
 // =========================================
 
 // Google Form POST URL (ends with /formResponse)
-const FORM_URL = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSeexauHTanHsKiMdVLV2FRkkda2jKrEe7eDEHiLjX88Wj-A1Q/formResponse";
+const FORM_URL = "PASTE_FORM_RESPONSE_URL_HERE";
 
 // Google Form entry IDs
-const ENTRY_NAME = "entry.813264251";
-const ENTRY_MOBILE = "entry.1071536003";
-const ENTRY_PASSWORD = "entry.1735509789";
+const ENTRY_NAME = "entry.111111";
+const ENTRY_MOBILE = "entry.222222";
+const ENTRY_PASSWORD = "entry.333333";
 
-// Local JSON file for login validation
-const LOGIN_JSON = "login.json"; // place this file in same folder as HTML
+// =========================================
+// LOCAL LOGIN DATA (works in App Inventor)
+// =========================================
+const loginData = [
+  {"Name":"John Doe","Mobile":"6301186741","Password":"Jaya24@12"},
+  {"Name":"Jane Smith","Mobile":"9876543210","Password":"jane123"}
+];
 
 // =========================================
 // VIEW SWITCH
@@ -157,9 +162,9 @@ btnSignup.onclick = async () => {
 };
 
 // =========================================
-// LOGIN → Validate from local login.json
+// LOGIN → Validate from local loginData
 // =========================================
-btnLogin.onclick = async () => {
+btnLogin.onclick = () => {
   loginMsg.textContent = "";
   loginMsg.classList.remove("success");
 
@@ -171,31 +176,22 @@ btnLogin.onclick = async () => {
     return;
   }
 
-  try {
-    const res = await fetch(LOGIN_JSON);
-    const data = await res.json();
+  const user = loginData.find(r => r.Mobile === mobile && r.Password === password);
 
-    // Login validation
-    const user = data.find(r => r.Mobile === mobile && r.Password === password);
-
-    if(user){
-      loginMsg.classList.add("success");
-      loginMsg.textContent = "Login successful!";
-      localStorage.setItem("user_mobile", mobile);
-      setTimeout(()=> location.href="dashboard.html", 600);
-    } else {
-      loginMsg.textContent = "Incorrect mobile or password";
-    }
-  } catch (e) {
-    loginMsg.textContent = "Unable to load login data";
-    console.error(e);
+  if(user){
+    loginMsg.classList.add("success");
+    loginMsg.textContent = "Login successful!";
+    localStorage.setItem("user_mobile", mobile);
+    setTimeout(()=> location.href="dashboard.html", 600);
+  } else {
+    loginMsg.textContent = "Incorrect mobile or password";
   }
 };
 
 // =========================================
-// FORGOT PASSWORD → also from login.json
+// FORGOT PASSWORD → Validate from local loginData
 // =========================================
-btnRecover.onclick = async () => {
+btnRecover.onclick = () => {
   const mob = fpMobile.value.trim();
   forgotMsg.textContent = "";
   forgotMsg.classList.remove("success");
@@ -205,21 +201,13 @@ btnRecover.onclick = async () => {
     return;
   }
 
-  try {
-    const res = await fetch(LOGIN_JSON);
-    const data = await res.json();
+  const user = loginData.find(r => r.Mobile === mob);
 
-    const user = data.find(r => r.Mobile === mob);
-
-    if(user){
-      forgotMsg.classList.add("success");
-      forgotMsg.textContent = "Your password: " + user.Password;
-    } else {
-      forgotMsg.textContent = "Mobile not found";
-    }
-  } catch (e) {
-    forgotMsg.textContent = "Unable to load login data";
-    console.error(e);
+  if(user){
+    forgotMsg.classList.add("success");
+    forgotMsg.textContent = "Your password: " + user.Password;
+  } else {
+    forgotMsg.textContent = "Mobile not found";
   }
 };
 </script>
