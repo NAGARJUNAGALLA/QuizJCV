@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login • Signup • Forgot (Google Form + CSV)</title>
+  <style>
+    :root{--brand:#003A8C;--bg:#f8fafc;}
+    body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);margin:0;padding:24px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+    .card{width:100%;max-width:420px;background:#fff;padding:20px;border-radius:10px;box-shadow:0 6px 20px rgba(13,38,76,0.08);}
+    h2{margin:0 0 12px;color:var(--brand);text-align:center;}
+    label{display:block;margin-top:10px;font-size:14px;color:#333;}
+    input{width:100%;padding:10px;border:1.5px solid #dbe6f5;border-radius:6px;margin-top:6px;font-size:15px;box-sizing:border-box;}
+    button{width:100%;padding:12px;margin-top:16px;background:var(--brand);color:#fff;border:0;border-radius:8px;font-size:16px;cursor:pointer;}
+    .muted{font-size:13px;color:#666;margin-top:8px;text-align:center;}
+    .links{display:flex;justify-content:center;gap:10px;margin-top:12px;font-size:14px;}
+    .links a{color:var(--brand);cursor:pointer;text-decoration:none;font-weight:600;}
+    .msg{margin-top:12px;text-align:center;font-size:14px;}
+    .error{color:#b00020;}
+    .success{color:green;}
+    .small{font-size:13px;color:#444;margin-top:6px}
+    .row{display:flex;gap:10px}
+    @media (max-width:420px){body{padding:12px}}
+  </style>
+</head>
+<body>
+
+  <div class="card" id="container">
+    <!-- LOGIN -->
+    <div id="loginView">
+      <h2>Login</h2>
+
+      <label for="loginMobile">Mobile number</label>
+      <input id="loginMobile" type="text" inputmode="numeric" placeholder="Enter registered mobile number">
+
+      <label for="loginPassword">Password</label>
+      <input id="loginPassword" type="password" placeholder="Enter password">
+
+      <button id="btnLogin">Login</button>
+
+      <p id="loginMsg" class="msg" aria-live="polite"></p>
+
+      <div class="links">
+        <a id="goSignup">Sign up</a>
+        <a id="goForgot">Forgot password?</a>
+      </div>
+
+      <p class="muted small">No alerts — errors/success appear below the button.</p>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="signupView" style="display:none;">
+      <h2>Sign Up</h2>
+
+      <label for="signupName">Full name</label>
+      <input id="signupName" type="text" placeholder="Your full name">
+
+      <label for="signupMobile">Mobile number</label>
+      <input id="signupMobile" type="text" inputmode="numeric" placeholder="Mobile number">
+
+      <label for="signupPassword">Password</label>
+      <input id="signupPassword" type="password" placeholder="Choose a password">
+
+      <button id="btnSignup">Create account</button>
+
+      <p id="signupMsg" class="msg" aria-live="polite"></p>
+
+      <div class="links">
+        <a id="backToLoginFromSignup">Back to login</a>
+      </div>
+    </div>
+
+    <!-- FORGOT -->
+    <div id="forgotView" style="display:none;">
+      <h2>Recover Password</h2>
+
+      <label for="forgotMobile">Mobile number</label>
+      <input id="forgotMobile" type="text" inputmode="numeric" placeholder="Enter your registered mobile">
+
+      <button id="btnRecover">Get password</button>
+
+      <p id="forgotMsg" class="msg" aria-live="polite"></p>
+
+      <div class="links">
+        <a id="backToLoginFromForgot">Back to login</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+/*
+  IMPORTANT: Replace the three placeholders below with your real links/IDs.
+
+  1) GOOGLE_FORM_URL -> the Google Form "formResponse" POST URL (ends with /formResponse)
+     Example:
+       https://docs.google.com/forms/d/e/1FAIpQLS....../formResponse
+
+  2) ENTRY_NAME / ENTRY_MOBILE / ENTRY_PASSWORD -> the entry.xxxxx field names from the form
+     Example:
+       entry.123456789
+       entry.987654321
+       entry.555555555
+
+  3) GOOGLE_SHEET_CSV -> the published CSV URL of the response sheet
+     Example:
+       https://docs.google.com/spreadsheets/d/e/XXXXXXXX/pub?output=csv
+*/
+
+const GOOGLE_FORM_URL = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSeexauHTanHsKiMdVLV2FRkkda2jKrEe7eDEHiLjX88Wj-A1Q/formResponse";
+const ENTRY_NAME = "entry.813264251";
+const ENTRY_MOBILE = "entry.1071536003";
+const ENTRY_PASSWORD = "entry.1735509789";
+const GOOGLE_SHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRiGsoxXafIhGNN_4fYm20d3kx3BJ43N3VzCBqL2zmkR5gV2ug5POW8VLbyaEIg3YGclvXsYozVBZ78/pub?output=csv";
+
+/* ----------------- UI helpers ----------------- */
+const $ = id => document.getElementById(id);
+
+const views = {
+  login: $('loginView'),
+  signup: $('signupView'),
+  forgot: $('forgotView')
+};
+const showView = (v) => {
+  for (const k in views) views[k].style.display = (k===v) ? 'block' : 'none';
+  // Clear all messages when switching
+  $('loginMsg').textContent = '';
+  $('signupMsg').textContent = '';
+  $('forgotMsg').textContent = '';
+};
+
+/* ----------------- Navigation wiring ----------------- */
+$('goSignup').addEventListener('click', ()=> showView('signup'));
+$('goForgot').addEventListener('click', ()=> showView('forgot'));
+$('backToLoginFromSignup').addEventListener('click', ()=> showView('login'));
+$('backToLoginFromForgot').addEventListener('click', ()=> showView('login'));
+
+/* ----------------- Helper: fetch CSV and return array of rows (array of arrays) ----------------- */
+async function fetchCSV(url) {
+  const res = await fetch(url, {cache: "no-store"});
+  const txt = await res.text();
+  // Basic CSV parsing (works for simple CSV without embedded newlines/commas in fields)
+  const lines = txt.trim().split(/\r?\n/).filter(Boolean);
+  return lines.map(line => {
+    // split on comma — if your sheet has commas inside fields this simple splitter will break.
+    // For robust parsing use a CSV parser library or ensure data has no commas.
+    return line.split(',').map(cell => cell.replace(/^"|"$/g, '').trim());
+  });
+}
+
+/* ----------------- SIGNUP (submit to Google Form) ----------------- */
+$('btnSignup').addEventListener('click', async function () {
+  const name = $('signupName').value.trim();
+  const mobile = $('signupMobile').value.trim();
+  const password = $('signupPassword').value.trim();
+  const msg = $('signupMsg');
+  msg.className = 'msg';
+  msg.textContent = '';
+
+  if (!name || !mobile || !password) {
+    msg.classList.add('error');
+    msg.textContent = 'All fields are required';
+    return;
+  }
+
+  // Build form data using the form entry IDs
+  const fd = new FormData();
+  fd.append(ENTRY_NAME, name);
+  fd.append(ENTRY_MOBILE, mobile);
+  fd.append(ENTRY_PASSWORD, password);
+
+  try {
+    // POST to Google Form (mode no-cors so browser won't show response)
+    await fetch(GOOGLE_FORM_URL, { method: 'POST', mode: 'no-cors', body: fd });
+    msg.classList.add('success');
+    msg.textContent = 'Sign up successful — you can login now';
+    // clear inputs (optional)
+    $('signupName').value=''; $('signupMobile').value=''; $('signupPassword').value='';
+    setTimeout(()=> showView('login'), 900);
+  } catch (e) {
+    msg.classList.add('error');
+    msg.textContent = 'Failed to submit. Check your form URL and try again.';
+  }
+});
+
+/* ----------------- LOGIN (validate against CSV) ----------------- */
+$('btnLogin').addEventListener('click', async function () {
+  const mobile = $('loginMobile').value.trim();
+  const password = $('loginPassword').value.trim();
+  const msg = $('loginMsg');
+  msg.className = 'msg';
+  msg.textContent = '';
+
+  if (!mobile || !password) {
+    msg.classList.add('error');
+    msg.textContent = 'Please enter mobile & password';
+    return;
+  }
+
+  if (!GOOGLE_SHEET_CSV.includes('http')) {
+    msg.classList.add('error');
+    msg.textContent = 'Please set GOOGLE_SHEET_CSV in the code.';
+    return;
+  }
+
+  try {
+    const rows = await fetchCSV(GOOGLE_SHEET_CSV);
+    // Expectation: first row is header; name,mobile,password OR similar. We will search for a row where mobile matches and password matches.
+    // Try to auto-detect which column is mobile/password by looking at header names (common patterns).
+    const header = rows[0].map(h => h.toLowerCase());
+    let mobileCol = header.findIndex(h => h.includes('mobile') || h.includes('phone') || h.includes('contact'));
+    let passCol = header.findIndex(h => h.includes('password') || h.includes('pass') || h.includes('pwd'));
+    // if not found, assume columns: Name, Mobile, Password -> indexes 0,1,2
+    if (mobileCol === -1) mobileCol = 1;
+    if (passCol === -1) passCol = 2;
+
+    let ok = false;
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r) continue;
+      const sheetMobile = (r[mobileCol] || '').trim();
+      const sheetPass = (r[passCol] || '').trim();
+      if (sheetMobile === mobile && sheetPass === password) { ok = true; break; }
+    }
+
+    if (ok) {
+      msg.classList.add('success');
+      msg.textContent = 'Login successful — redirecting...';
+      // Optional: save a flag in localStorage
+      localStorage.setItem('jcv_user_mobile', mobile);
+      setTimeout(()=> location.href = 'classvi/dashboard.html', 700);
+    } else {
+      msg.classList.add('error');
+      msg.textContent = 'Invalid mobile number or password';
+    }
+  } catch (e) {
+    msg.classList.add('error');
+    msg.textContent = 'Unable to fetch user data (check your published CSV URL).';
+    console.error(e);
+  }
+});
+
+/* ----------------- FORGOT PASSWORD (look up CSV by mobile) ----------------- */
+$('btnRecover').addEventListener('click', async function () {
+  const mobile = $('forgotMobile').value.trim();
+  const msg = $('forgotMsg');
+  msg.className = 'msg';
+  msg.textContent = '';
+
+  if (!mobile) {
+    msg.classList.add('error');
+    msg.textContent = 'Enter your registered mobile number';
+    return;
+  }
+  if (!GOOGLE_SHEET_CSV.includes('http')) {
+    msg.classList.add('error');
+    msg.textContent = 'Please set GOOGLE_SHEET_CSV in the code.';
+    return;
+  }
+
+  try {
+    const rows = await fetchCSV(GOOGLE_SHEET_CSV);
+    const header = rows[0].map(h => h.toLowerCase());
+    let mobileCol = header.findIndex(h => h.includes('mobile') || h.includes('phone') || h.includes('contact'));
+    let passCol = header.findIndex(h => h.includes('password') || h.includes('pass') || h.includes('pwd'));
+    if (mobileCol === -1) mobileCol = 1;
+    if (passCol === -1) passCol = 2;
+
+    let foundPass = null;
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r) continue;
+      const sheetMobile = (r[mobileCol] || '').trim();
+      const sheetPass = (r[passCol] || '').trim();
+      if (sheetMobile === mobile) { foundPass = sheetPass; break; }
+    }
+
+    if (foundPass) {
+      msg.classList.add('success');
+      msg.innerHTML = 'Your password: <strong>' + escapeHtml(foundPass) + '</strong>';
+    } else {
+      msg.classList.add('error');
+      msg.textContent = 'Mobile number not found';
+    }
+  } catch (e) {
+    msg.classList.add('error');
+    msg.textContent = 'Unable to fetch data. Check your CSV URL.';
+    console.error(e);
+  }
+});
+
+/* small HTML esc to prevent accidental HTML injection in displayed password */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* show default view */
+showView('login');
+</script>
+</body>
+</html>
