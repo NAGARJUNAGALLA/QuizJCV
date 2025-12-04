@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Login / Signup</title>
+<title>JCV ICE LOGIN</title>
 <style>
 body{
   font-family:Arial;
@@ -36,7 +36,7 @@ button{width:100%;padding:12px;background:#003A8C;color:#fff;border:0;border-rad
 <body>
 
 <div class="card">
-
+<h2>JCV ICE</h2>
 <!-- LOGIN -->
 <div id="loginView">
 <h2>Login</h2>
@@ -92,18 +92,18 @@ button{width:100%;padding:12px;background:#003A8C;color:#fff;border:0;border-rad
 
 <script>
 // =========================================
-// 🔴 REPLACE THESE VALUES
+// 🔴 CONFIGURE THESE VALUES
 // =========================================
 
-// 1) Your Google Form POST URL (ends with /formResponse)
+// Google Form POST URL (ends with /formResponse)
 const FORM_URL = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSeexauHTanHsKiMdVLV2FRkkda2jKrEe7eDEHiLjX88Wj-A1Q/formResponse";
 
-// 2) Replace entry IDs from your form
+// Google Form entry IDs
 const ENTRY_NAME = "entry.813264251";
 const ENTRY_MOBILE = "entry.1071536003";
 const ENTRY_PASSWORD = "entry.1735509789";
 
-// 3) JSON API of your sheet (NO script needed)
+// Opensheet JSON URL
 const JSON_URL = "https://opensheet.vercel.app/1KW4oge1mjsHnZw5rXF7HXTKbSM7XD3d9GFkT8yfNCP4/Sheet1";
 
 // =========================================
@@ -126,7 +126,7 @@ function showForgot(){
 }
 
 // =========================================
-// SIGNUP → Google Form (NO SCRIPT)
+// SIGNUP → Google Form
 // =========================================
 btnSignup.onclick = async () => {
   signupMsg.textContent = "";
@@ -147,7 +147,7 @@ btnSignup.onclick = async () => {
   fd.append(ENTRY_PASSWORD, password);
 
   try {
-    await fetch(FORM_URL, {method:"POST",mode:"no-cors",body:fd});
+    await fetch(FORM_URL, {method:"POST", mode:"no-cors", body:fd});
     signupMsg.classList.add("success");
     signupMsg.textContent = "Account created! You can login now.";
     suName.value = suMobile.value = suPassword.value = "";
@@ -157,7 +157,7 @@ btnSignup.onclick = async () => {
 };
 
 // =========================================
-// LOGIN (validate through JSON)
+// LOGIN → Validate JSON via CORS proxy
 // =========================================
 btnLogin.onclick = async () => {
   loginMsg.textContent = "";
@@ -172,19 +172,18 @@ btnLogin.onclick = async () => {
   }
 
   try {
-    const res = await fetch(JSON_URL);
+    const proxyURL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(JSON_URL);
+    const res = await fetch(proxyURL);
     const data = await res.json();
-    
-    console.log(data); // 🔹 check keys from sheet
 
-    // Replace "Mobile" and "Password" with exact column names from your sheet JSON
+    // 🔹 Replace keys with your sheet column names
     const user = data.find(r => r.Mobile === mobile && r.Password === password);
 
     if(user){
       loginMsg.classList.add("success");
       loginMsg.textContent = "Login successful!";
       localStorage.setItem("user_mobile", mobile);
-      setTimeout(()=> location.href="classvi/dashboard.html", 600);
+      setTimeout(()=> location.href="dashboard.html", 600);
     } else {
       loginMsg.textContent = "Incorrect mobile or password";
     }
@@ -195,7 +194,7 @@ btnLogin.onclick = async () => {
 };
 
 // =========================================
-// FORGOT PASSWORD
+// FORGOT PASSWORD → JSON via CORS proxy
 // =========================================
 btnRecover.onclick = async () => {
   const mob = fpMobile.value.trim();
@@ -208,10 +207,11 @@ btnRecover.onclick = async () => {
   }
 
   try {
-    const res = await fetch(JSON_URL);
+    const proxyURL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(JSON_URL);
+    const res = await fetch(proxyURL);
     const data = await res.json();
 
-    const user = data.find(r => r.Mobile === mob); // exact key name
+    const user = data.find(r => r.Mobile === mob); // exact column key
 
     if(user){
       forgotMsg.classList.add("success");
