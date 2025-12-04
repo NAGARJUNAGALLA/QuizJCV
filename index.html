@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JCV ICE LOGIN</title>
+<title>Login / Signup</title>
 <style>
 body{
   font-family:Arial;
@@ -36,7 +36,7 @@ button{width:100%;padding:12px;background:#003A8C;color:#fff;border:0;border-rad
 <body>
 
 <div class="card">
-<h2>JCV ICE</h2>
+
 <!-- LOGIN -->
 <div id="loginView">
 <h2>Login</h2>
@@ -103,8 +103,8 @@ const ENTRY_NAME = "entry.813264251";
 const ENTRY_MOBILE = "entry.1071536003";
 const ENTRY_PASSWORD = "entry.1735509789";
 
-// Opensheet JSON URL
-const JSON_URL = "https://opensheet.vercel.app/1KW4oge1mjsHnZw5rXF7HXTKbSM7XD3d9GFkT8yfNCP4/Sheet1";
+// Local JSON file for login validation
+const LOGIN_JSON = "login.json"; // place this file in same folder as HTML
 
 // =========================================
 // VIEW SWITCH
@@ -157,7 +157,7 @@ btnSignup.onclick = async () => {
 };
 
 // =========================================
-// LOGIN → Validate JSON via CORS proxy
+// LOGIN → Validate from local login.json
 // =========================================
 btnLogin.onclick = async () => {
   loginMsg.textContent = "";
@@ -172,11 +172,10 @@ btnLogin.onclick = async () => {
   }
 
   try {
-    const proxyURL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(JSON_URL);
-    const res = await fetch(proxyURL);
+    const res = await fetch(LOGIN_JSON);
     const data = await res.json();
 
-    // 🔹 Replace keys with your sheet column names
+    // Login validation
     const user = data.find(r => r.Mobile === mobile && r.Password === password);
 
     if(user){
@@ -188,13 +187,13 @@ btnLogin.onclick = async () => {
       loginMsg.textContent = "Incorrect mobile or password";
     }
   } catch (e) {
-    loginMsg.textContent = "Unable to load data (Check JSON URL)";
+    loginMsg.textContent = "Unable to load login data";
     console.error(e);
   }
 };
 
 // =========================================
-// FORGOT PASSWORD → JSON via CORS proxy
+// FORGOT PASSWORD → also from login.json
 // =========================================
 btnRecover.onclick = async () => {
   const mob = fpMobile.value.trim();
@@ -207,11 +206,10 @@ btnRecover.onclick = async () => {
   }
 
   try {
-    const proxyURL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(JSON_URL);
-    const res = await fetch(proxyURL);
+    const res = await fetch(LOGIN_JSON);
     const data = await res.json();
 
-    const user = data.find(r => r.Mobile === mob); // exact column key
+    const user = data.find(r => r.Mobile === mob);
 
     if(user){
       forgotMsg.classList.add("success");
@@ -220,7 +218,7 @@ btnRecover.onclick = async () => {
       forgotMsg.textContent = "Mobile not found";
     }
   } catch (e) {
-    forgotMsg.textContent = "Unable to load data (Check JSON URL)";
+    forgotMsg.textContent = "Unable to load login data";
     console.error(e);
   }
 };
