@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLN Score Card</title>
+
+<style>
+body{font-family:Arial;margin:0;background:#f7f7f7;}
+.header{padding:15px;font-size:22px;font-weight:bold;background:#fff;
+border-bottom:2px solid #ddd;text-align:center;}
+.card{background:#fff;margin:15px;padding:15px;border-radius:12px;
+box-shadow:0 2px 6px rgba(0,0,0,0.15);}
+.title-row{display:flex;justify-content:space-between;
+background:#efc27d;padding:12px;border-radius:10px;font-weight:bold;}
+.row-3col{display:flex;justify-content:space-between;align-items:center;
+padding:15px 5px;}
+.label-btn{padding:15px;width:45%;text-align:center;color:white;border-radius:10px;
+font-size:18px;font-weight:bold;}
+.num-box{font-size:22px;font-weight:bold;}
+.sky{background:#1fcfaa;}
+.mountain{background:#ff8146;}
+.stream{background:#e32020;}
+
+.student-row{background:#fff;display:flex;justify-content:space-between;
+align-items:center;padding:12px;margin:10px 0;border-radius:12px;
+box-shadow:0 1px 4px rgba(0,0,0,0.15);}
+.stud-name{font-weight:bold;font-size:16px;}
+.stud-id{font-size:13px;color:#555;}
+.score-box{padding: 12px;border-radius:0px 10px 10px 0px;font-weight:bold;color:#fff;}
+.back-btn{padding:10px 15px;font-size:18px;cursor:pointer;}
+.hide{display:none;}
+</style>
+</head>
+
+<body>
+
+<!-- ================== PAGE 1 ================== -->
+<div id="page1">
+    <div class="header">FLN Score Card</div>
+
+    <!-- TELUGU BLOCK -->
+    <div class="card" onclick="openSubject('Telugu')">
+        <div class="title-row">
+            <span>Class - 4(9)</span>
+            <span>Telugu</span>
+        </div>
+
+        <div class="row-3col">
+            <div class="label-btn sky">Sky</div>
+            <div class="num-box">6</div>
+        </div>
+
+        <div class="row-3col">
+            <div class="label-btn mountain">Mountain</div>
+            <div class="num-box">1</div>
+        </div>
+
+        <div class="row-3col">
+            <div class="label-btn stream">Stream</div>
+            <div class="num-box">2</div>
+        </div>
+    </div>
+
+
+    <!-- ENGLISH BLOCK -->
+    <div class="card" onclick="openSubject('English')">
+        <div class="title-row">
+            <span>Class - 4(9)</span>
+            <span>English</span>
+        </div>
+
+        <div class="row-3col">
+            <div class="label-btn sky">Sky</div>
+            <div class="num-box">5</div>
+        </div>
+
+        <div class="row-3col">
+            <div class="label-btn mountain">Mountain</div>
+            <div class="num-box">2</div>
+        </div>
+
+        <div class="row-3col">
+            <div class="label-btn stream">Stream</div>
+            <div class="num-box">2</div>
+        </div>
+    </div>
+
+
+    <!-- MATHS BLOCK -->
+    <div class="card" onclick="openSubject('Maths')">
+        <div class="title-row">
+            <span>Class - 4(9)</span>
+            <span>Maths</span>
+        </div>
+
+        <div class="row-3col">
+            <div class="label-btn sky">Sky</div>
+            <div class="num-box">7</div>
+        </div>
+
+        <div class="row-3col">
+            <div class="label-btn mountain">Mountain</div>
+            <div class="num-box">1</div>
+        </div>
+
+        <div class="row-3col">
+            <div class="label-btn stream">Stream</div>
+            <div class="num-box">1</div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ================== PAGE 2 ================== -->
+<div id="page2" class="hide">
+
+    <div class="header">
+        <span class="back-btn" onclick="goBack()">⬅</span>
+        FLN Score Card
+    </div>
+
+    <div class="card">
+        <div class="title-row">
+            <span>Class - 4</span>
+            <span id="subjectTitle"></span>
+        </div>
+
+        <div id="studentList"></div>
+    </div>
+</div>
+
+<script>
+// Student data for Page 2
+const data = {
+    Telugu: [
+        {name:"DASARI SARASWATHI", id:"3000663777", score:36},
+        {name:"DAVU SAI VIJAYA", id:"3000955840", score:18},
+        {name:"FARZANA KHAN", id:"3000956843", score:46},
+        {name:"GUMMADI TEJA SREE SARASWATI", id:"3000728793", score:48},
+        {name:"JAMALLA KIRAN PRASHANTH", id:"3000947589", score:42},
+        {name:"MAGANTI JAI DEVANJANEYULU", id:"3001117787", score:14},
+        {name:"POTHAKAMURI MALLIKARJUNA VITAL KUMAR", id:"3000956472", score:45},
+        {name:"RAYAVARAPU ANAND BABU", id:"3001004695", score:42},
+        {name:"SALA YASASWINI", id:"3000956596", score:26}
+    ],
+    English: [
+        {name:"DASARI SARASWATHI", id:"3000663777", score:32},
+        {name:"DAVU SAI VIJAYA", id:"3000955840", score:12},
+        {name:"FARZANA KHAN", id:"3000956843", score:42},
+        {name:"GUMMADI TEJA SREE SARASWATI", id:"3000728793", score:44},
+        {name:"JAMALLA KIRAN PRASHANTH", id:"3000947589", score:37},
+        {name:"MAGANTI JAI DEVANJANEYULU", id:"3001117787", score:20},
+        {name:"POTHAKAMURI MALLIKARJUNA VITAL KUMAR", id:"3000956472", score:39},
+        {name:"RAYAVARAPU ANAND BABU", id:"3001004695", score:44},
+        {name:"SALA YASASWINI", id:"3000956596", score:24}
+    ],
+    Maths: [
+        {name:"DASARI SARASWATHI", id:"3000663777", score:36},
+        {name:"DAVU SAI VIJAYA", id:"3000955840", score:8},
+        {name:"FARZANA KHAN", id:"3000956843", score:50},
+        {name:"GUMMADI TEJA SREE SARASWATI", id:"3000728793", score:48},
+        {name:"JAMALLA KIRAN PRASHANTH", id:"3000947589", score:48},
+        {name:"MAGANTI JAI DEVANJANEYULU", id:"3001117787", score:26},
+        {name:"POTHAKAMURI MALLIKARJUNA VITAL KUMAR", id:"3000956472", score:45},
+        {name:"RAYAVARAPU ANAND BABU", id:"3001004695", score:48},
+        {name:"SALA YASASWINI", id:"3000956596", score:38}
+    ]
+};
+
+// Open subject
+function openSubject(sub){
+    document.getElementById("page1").classList.add("hide");
+    document.getElementById("page2").classList.remove("hide");
+
+    document.getElementById("subjectTitle").innerText = sub;
+
+    let list = "";
+    data[sub].forEach(s=>{
+        let color = s.score >= 36 ? "#1fcfaa" : s.score >= 21 ? "#ff8146" : "#e32020";
+        list += `
+        <div class="student-row">
+            <div>
+                <div class="stud-name">${s.name}</div>
+                <div class="stud-id">ID : ${s.id}</div>
+            </div>
+            <div class="score-box" style="background:${color}">${s.score}</div>
+        </div>`;
+    });
+    document.getElementById("studentList").innerHTML = list;
+}
+
+// Back
+function goBack(){
+    document.getElementById("page2").classList.add("hide");
+    document.getElementById("page1").classList.remove("hide");
+}
+</script>
+
+</body>
+</html>
