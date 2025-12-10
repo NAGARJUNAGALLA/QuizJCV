@@ -1,156 +1,178 @@
 <!DOCTYPE html>
-<html lang="te">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Card Viewer</title>
+<title>Dashboard</title>
 
 <style>
 body{
-    font-family: "Noto Sans Telugu", sans-serif;
-    background:#fff7ef;
     margin:0;
-    padding:20px;
+    font-family: Arial, sans-serif;
+    background:#ffffff;
 }
 
-.card{
-    border:2px solid #ff6b00;
-    border-radius:20px;
-    padding:20px;
-    background:white;
-    display:none;
-}
-
-.card.active{
-    display:block;
-}
-
-.section-number{
-    width:45px;
-    height:45px;
-    background:#ff6b00;
+/* TOP BAR */
+.topbar{
+    background:#3F51B5;
     color:white;
-    font-size:26px;
-    font-weight:bold;
-    border-radius:50%;
+    padding:15px;
+    font-size:20px;
     display:flex;
     align-items:center;
-    justify-content:center;
-    margin-bottom:10px;
 }
 
-.section-title{
-    font-size:22px;
-    color:#ff6b00;
-    font-weight:bold;
-    margin-bottom:15px;
-}
-
-.nav-buttons{
-    margin-top:20px;
-    display:flex;
-    justify-content:space-between;
-}
-
-button{
-    padding:10px 20px;
-    background:#ff6b00;
-    border:none;
-    border-radius:10px;
-    color:white;
-    font-size:18px;
-    font-weight:bold;
+.menu-btn{
+    font-size:26px;
+    margin-right:20px;
     cursor:pointer;
 }
 
-button:disabled{
-    background:#ffa766;
+.top-title{
+    flex:1;
+}
+
+/* SIDE NAV */
+.sidenav{
+    height:100%;
+    width:0;
+    position:fixed;
+    z-index:10;
+    top:0;
+    left:0;
+    background:#3F51B5;
+    padding-top:60px;
+    overflow-x:hidden;
+    transition:0.4s;
+}
+
+.sidenav a{
+    padding:12px 25px;
+    text-decoration:none;
+    color:white;
+    display:block;
+    font-size:18px;
+}
+
+.sidenav a:hover{
+    background:#303F9F;
+}
+
+.closebtn{
+    position:absolute;
+    top:10px;
+    right:20px;
+    font-size:30px;
+    cursor:pointer;
+}
+
+/* GRID BLOCKS */
+.grid-container{
+    margin:20px;
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    text-align:center;
+}
+
+.block{
+    padding:15px;
+    cursor:pointer;
+}
+
+.block img{
+    width:70px;
+    height:70px;
+}
+
+.block-text{
+    margin-top:10px;
+    font-size:16px;
+    font-weight:bold;
+}
+
+/* FIXED BOTTOM NAV BAR */
+.bottom-bar{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#3F51B5;
+    color:white;
+    text-align:center;
+    padding:12px 0;
+    font-size:16px;
+    z-index:20;
+    box-shadow:0 -2px 5px rgba(0,0,0,0.2);
 }
 </style>
+
+<script>
+function openNav(){
+    document.getElementById("sideNav").style.width = "250px";
+}
+function closeNav(){
+    document.getElementById("sideNav").style.width = "0";
+}
+</script>
 
 </head>
 <body>
 
-<!-- CARD 1 -->
-<div class="card active">
-    <div class="section-number">1</div>
-    <div class="section-title">పదాల అర్థార్థాలు</div>
-    <p>
-        విద్యార్థులు ఒక పదాన్ని చెబుతారు. ఆ పదానికి వారు రెండు అర్థాలు చెప్తారు.
-        మిగతా విద్యార్థులు వాటి అర్థాలను అంచనా వేస్తారు.
-    </p>
+<!-- TOP BAR -->
+<div class="topbar">
+    <span class="menu-btn" onclick="openNav()">&#9776;</span>
+    <span class="top-title">Home</span>
+    <a href="index.html">🏠</a>
 </div>
 
-<!-- CARD 2 -->
-<div class="card">
-    <div class="section-number">2</div>
-    <div class="section-title">నా కథ – నా ఇష్టం</div>
-    <p>
-        పిల్లలకు బొమ్మలు చూపించి చిన్న కథలను చెప్పమంటారు.
-    </p>
+<!-- SIDE NAVIGATION -->
+<div id="sideNav" class="sidenav">
+    <span class="closebtn" onclick="closeNav()">&times;</span>
+    
+    <a href="index.html">Home</a>
+    <a href="student-profile.html">Student Profile</a>
+    <a href="attendance.html">Student Attendance</a>
+    <a href="marks.html">Student Marks</a>
+    <a href="exam-schedule.html">Exam Schedule</a>
+    <a href="material.html">Material</a>
+    <a href="fln.html">G FLN</a>
+        
 </div>
 
-<!-- CARD 3 -->
-<div class="card">
-    <div class="section-number">3</div>
-    <div class="section-title">కథలుద్దాం!</div>
-    <p>
-        పిల్లలు ఒక చిన్న కథ చెబుతారు. మిగతా వారు పదాలను గుర్తిస్తారు.
-    </p>
+<!-- DASHBOARD GRID -->
+<div class="grid-container">
+
+    <div class="block" onclick="location.href='student-profile.html'">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png">
+        <div class="block-text">Student Profile</div>
+    </div>
+
+    <div class="block" onclick="location.href='attendance.html'">
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png">
+        <div class="block-text">Student Attendance</div>
+    </div>
+
+    <div class="block" onclick="location.href='marks.html'">
+        <img src="https://cdn-icons-png.flaticon.com/512/4727/4727424.png">
+        <div class="block-text">Student Marks</div>
+    </div>
+
+    <div class="block" onclick="location.href='exam-schedule.html'">
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828970.png">
+        <div class="block-text">Exam Schedule</div>
+    </div>
+
+    <div class="block" onclick="location.href='material.html'">
+        <img src="https://cdn-icons-png.flaticon.com/512/2995/2995620.png">
+        <div class="block-text">Material</div>
+    </div>
+
 </div>
 
-<!-- CARD 4 -->
-<div class="card">
-    <div class="section-number">4</div>
-    <div class="section-title">బొమ్మలతో కమ్మని కథలు</div>
-    <p>
-        బొమ్మలను ఆధారంగా చిన్న కథలను చెప్పమంటారు.
-    </p>
+<!-- FIXED BOTTOM NAVIGATION -->
+<div class="bottom-bar">
+    Powered By JCV Tuition Centre
 </div>
-
-<!-- CARD 5 -->
-<div class="card">
-    <div class="section-number">5</div>
-    <div class="section-title">అంతం నివేదికలో</div>
-    <p>
-        చివర్లో కథలను సమీక్షించి మాట్లాడే నైపుణ్యాన్ని అభివృద్ధి చేస్తారు.
-    </p>
-</div>
-
-<!-- NAVIGATION BUTTONS -->
-<div class="nav-buttons">
-    <button id="prevBtn" onclick="prevCard()" disabled>Prev</button>
-    <button id="nextBtn" onclick="nextCard()">Next</button>
-</div>
-
-<script>
-let current = 0;
-const cards = document.querySelectorAll(".card");
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
-
-function showCard(index){
-    cards.forEach((card,i)=>{
-        card.classList.toggle("active", i === index);
-    });
-    prevBtn.disabled = index === 0;
-    nextBtn.disabled = index === cards.length - 1;
-}
-
-function nextCard(){
-    if(current < cards.length - 1){
-        current++;
-        showCard(current);
-    }
-}
-
-function prevCard(){
-    if(current > 0){
-        current--;
-        showCard(current);
-    }
-}
-</script>
 
 </body>
 </html>
