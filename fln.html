@@ -37,6 +37,7 @@ box-shadow:0 1px 4px rgba(0,0,0,0.15);}
     font-size:20px;
     display:flex;
     align-items:center;
+    position:fixed;
 }
 
 .menu-btn{
@@ -108,17 +109,16 @@ box-shadow:0 1px 4px rgba(0,0,0,0.15);}
 <div id="sideNav" class="sidenav">
     <span class="closebtn" onclick="closeNav()">&times;</span>
 
+    <a href="index.html">Home</a>
     <a href="student-profile.html">Student Profile</a>
     <a href="attendance.html">Student Attendance</a>
     <a href="marks.html">Student Marks</a>
     <a href="exam-schedule.html">Exam Schedule</a>
     <a href="material.html">Material</a>
     <a href="fln.html">G FLN</a>
+    <a href="https://www.google.com/">Google</a>
 </div>
-    <!-- FIXED BOTTOM NAVIGATION -->
-<div class="bottom-bar">
-    Powered By JCV Tuition Centre
-</div>
+    
 <!-- ================== PAGE 1 ================== -->
 <div id="page1">
     <div class="header">FLN Score Card</div>
@@ -214,10 +214,6 @@ box-shadow:0 1px 4px rgba(0,0,0,0.15);}
         <div id="studentList"></div>
     </div>
 </div>
-<!-- FIXED BOTTOM NAVIGATION -->
-<div class="bottom-bar">
-    Powered By JCV Tuition Centre
-</div>
 <script>
 // Student data for Page 2
 const data = {
@@ -290,9 +286,6 @@ function closeNav(){
     document.getElementById("sideNav").style.width = "0";
 }
 </script>
-<!-- FIXED BOTTOM NAVIGATION -->
-<div class="bottom-bar">
-    Powered By JCV Tution Centre
-</div>
+
 </body>
 </html>
