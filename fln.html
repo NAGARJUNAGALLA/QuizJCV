@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1, user-scalable=no ">
 <title>FLN Score Card</title>
 
 <style>
@@ -30,11 +30,91 @@ box-shadow:0 1px 4px rgba(0,0,0,0.15);}
 .score-box{padding: 12px;border-radius:0px 10px 10px 0px;font-weight:bold;color:#fff;}
 .back-btn{padding:10px 15px;font-size:18px;cursor:pointer;}
 .hide{display:none;}
+    .topbar{
+    background:#3F51B5;
+    color:white;
+    padding:15px;
+    font-size:20px;
+    display:flex;
+    align-items:center;
+}
+
+.menu-btn{
+    font-size:26px;
+    margin-right:20px;
+    cursor:pointer;
+}
+
+.top-title{
+    flex:1;
+}
+
+/* SIDE NAV */
+.sidenav{
+    height:100%;
+    width:0;
+    position:fixed;
+    z-index:10;
+    top:0;
+    left:0;
+    background:#3F51B5;
+    padding-top:60px;
+    overflow-x:hidden;
+    transition:0.4s;
+}
+
+.sidenav a{
+    padding:12px 25px;
+    text-decoration:none;
+    color:white;
+    display:block;
+    font-size:18px;
+}
+
+.sidenav a:hover{
+    background:#303F9F;
+}
+
+.closebtn{
+    position:absolute;
+    top:10px;
+    right:20px;
+    font-size:30px;
+    cursor:pointer;
+    /* FIXED BOTTOM NAV BAR */
+.bottom-bar{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#3F51B5;
+    color:white;
+    text-align:center;
+    padding:12px 0;
+    font-size:16px;
+    z-index:20;
+    box-shadow:0 -2px 5px rgba(0,0,0,0.2);
+}
 </style>
 </head>
 
 <body>
+<div class="topbar">
+    <span class="menu-btn" onclick="openNav()">&#9776;</span>
+    <span class="top-title">Home</span>
+</div>
 
+<!-- SIDE NAVIGATION -->
+<div id="sideNav" class="sidenav">
+    <span class="closebtn" onclick="closeNav()">&times;</span>
+
+    <a href="student-profile.html">Student Profile</a>
+    <a href="attendance.html">Student Attendance</a>
+    <a href="marks.html">Student Marks</a>
+    <a href="exam-schedule.html">Exam Schedule</a>
+    <a href="material.html">Material</a>
+    <a href="fln.html">G FLN</a>
+</div>
 <!-- ================== PAGE 1 ================== -->
 <div id="page1">
     <div class="header">FLN Score Card</div>
@@ -130,7 +210,10 @@ box-shadow:0 1px 4px rgba(0,0,0,0.15);}
         <div id="studentList"></div>
     </div>
 </div>
-
+<!-- FIXED BOTTOM NAVIGATION -->
+<div class="bottom-bar">
+    Powered By JCV Tuition Centre
+</div>
 <script>
 // Student data for Page 2
 const data = {
@@ -195,6 +278,12 @@ function openSubject(sub){
 function goBack(){
     document.getElementById("page2").classList.add("hide");
     document.getElementById("page1").classList.remove("hide");
+}
+    function openNav(){
+    document.getElementById("sideNav").style.width = "250px";
+}
+function closeNav(){
+    document.getElementById("sideNav").style.width = "0";
 }
 </script>
 
