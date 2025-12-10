@@ -1,180 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="te">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobile Drawing Board</title>
+<title>Card Viewer</title>
 
 <style>
-    body {
-        margin: 0;
-        background: #000;
-        font-family: Arial;
-        overflow: hidden;
-    }
+body{
+    font-family: "Noto Sans Telugu", sans-serif;
+    background:#fff7ef;
+    margin:0;
+    padding:20px;
+}
 
-    /* Chalkboard */
-    #board {
-        background: #0d3b20;
-        width: 100vw;
-        height: calc(100vh - 90px);
-        touch-action: none;
-        display: block;
-    }
+.card{
+    border:2px solid #ff6b00;
+    border-radius:20px;
+    padding:20px;
+    background:white;
+    display:none;
+}
 
-    /* Bottom toolbar */
-    #toolbar {
-        height: 90px;
-        background: #1f1f1f;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        padding: 5px;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-    }
+.card.active{
+    display:block;
+}
 
-    .tool {
-        width: 55px;
-        height: 55px;
-        border-radius: 12px;
-        background: #333;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        font-size: 12px;
-        flex-direction: column;
-    }
+.section-number{
+    width:45px;
+    height:45px;
+    background:#ff6b00;
+    color:white;
+    font-size:26px;
+    font-weight:bold;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:10px;
+}
 
-    #colorPicker {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        border: 3px solid white;
-        background: red;
-    }
+.section-title{
+    font-size:22px;
+    color:#ff6b00;
+    font-weight:bold;
+    margin-bottom:15px;
+}
 
-    button {
-        border: none;
-        color: white;
-        background: #444;
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 12px;
-    }
+.nav-buttons{
+    margin-top:20px;
+    display:flex;
+    justify-content:space-between;
+}
+
+button{
+    padding:10px 20px;
+    background:#ff6b00;
+    border:none;
+    border-radius:10px;
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:disabled{
+    background:#ffa766;
+}
 </style>
-</head>
 
+</head>
 <body>
 
-<canvas id="board"></canvas>
+<!-- CARD 1 -->
+<div class="card active">
+    <div class="section-number">1</div>
+    <div class="section-title">పదాల అర్థార్థాలు</div>
+    <p>
+        విద్యార్థులు ఒక పదాన్ని చెబుతారు. ఆ పదానికి వారు రెండు అర్థాలు చెప్తారు.
+        మిగతా విద్యార్థులు వాటి అర్థాలను అంచనా వేస్తారు.
+    </p>
+</div>
 
-<div id="toolbar">
+<!-- CARD 2 -->
+<div class="card">
+    <div class="section-number">2</div>
+    <div class="section-title">నా కథ – నా ఇష్టం</div>
+    <p>
+        పిల్లలకు బొమ్మలు చూపించి చిన్న కథలను చెప్పమంటారు.
+    </p>
+</div>
 
-    <input type="color" id="colorPicker">
+<!-- CARD 3 -->
+<div class="card">
+    <div class="section-number">3</div>
+    <div class="section-title">కథలుద్దాం!</div>
+    <p>
+        పిల్లలు ఒక చిన్న కథ చెబుతారు. మిగతా వారు పదాలను గుర్తిస్తారు.
+    </p>
+</div>
 
-    <div class="tool" onclick="setTool('pen')">Pen</div>
-    <div class="tool" onclick="setTool('marker')">Marker</div>
-    <div class="tool" onclick="setTool('brush')">Brush</div>
-    <div class="tool" onclick="setTool('eraser')">Erase</div>
+<!-- CARD 4 -->
+<div class="card">
+    <div class="section-number">4</div>
+    <div class="section-title">బొమ్మలతో కమ్మని కథలు</div>
+    <p>
+        బొమ్మలను ఆధారంగా చిన్న కథలను చెప్పమంటారు.
+    </p>
+</div>
 
-    <button onclick="clearBoard()">Clear</button>
+<!-- CARD 5 -->
+<div class="card">
+    <div class="section-number">5</div>
+    <div class="section-title">అంతం నివేదికలో</div>
+    <p>
+        చివర్లో కథలను సమీక్షించి మాట్లాడే నైపుణ్యాన్ని అభివృద్ధి చేస్తారు.
+    </p>
+</div>
 
+<!-- NAVIGATION BUTTONS -->
+<div class="nav-buttons">
+    <button id="prevBtn" onclick="prevCard()" disabled>Prev</button>
+    <button id="nextBtn" onclick="nextCard()">Next</button>
 </div>
 
 <script>
-    const canvas = document.getElementById("board");
-    const ctx = canvas.getContext("2d");
+let current = 0;
+const cards = document.querySelectorAll(".card");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
 
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight - 90;
+function showCard(index){
+    cards.forEach((card,i)=>{
+        card.classList.toggle("active", i === index);
+    });
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === cards.length - 1;
+}
+
+function nextCard(){
+    if(current < cards.length - 1){
+        current++;
+        showCard(current);
     }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+}
 
-    let drawing = false;
-    let tool = "pen";
-    let color = "#ffffff";
-    let size = 3;
-
-    function setTool(t) {
-        tool = t;
-        if (t === "pen") size = 3;
-        if (t === "marker") size = 8;
-        if (t === "brush") size = 15;
-        if (t === "eraser") size = 20;
+function prevCard(){
+    if(current > 0){
+        current--;
+        showCard(current);
     }
-
-    document.getElementById("colorPicker").oninput = (e) => {
-        color = e.target.value;
-    };
-
-    function clearBoard() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function getPosition(event) {
-        const rect = canvas.getBoundingClientRect(); // exact canvas position
-        let x, y;
-
-        if (event.touches) {
-            x = event.touches[0].clientX - rect.left;
-            y = event.touches[0].clientY - rect.top;
-        } else {
-            x = event.clientX - rect.left;
-            y = event.clientY - rect.top;
-        }
-
-        return { x, y };
-    }
-
-    function startDrawing(e) {
-        drawing = true;
-        const pos = getPosition(e);
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-        e.preventDefault();
-    }
-
-    function stopDrawing() {
-        drawing = false;
-        ctx.beginPath();
-    }
-
-    function draw(e) {
-        if (!drawing) return;
-
-        const pos = getPosition(e);
-
-        ctx.lineCap = "round";
-        ctx.lineWidth = size;
-
-        if (tool === "eraser") {
-            ctx.strokeStyle = "#0d3b20";
-        } else {
-            ctx.strokeStyle = color;
-        }
-
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-
-        e.preventDefault();
-    }
-
-    // Mouse events
-    canvas.addEventListener("mousedown", startDrawing);
-    canvas.addEventListener("mouseup", stopDrawing);
-    canvas.addEventListener("mousemove", draw);
-
-    // Touch events
-    canvas.addEventListener("touchstart", startDrawing);
-    canvas.addEventListener("touchend", stopDrawing);
-    canvas.addEventListener("touchmove", draw);
-
+}
 </script>
 
 </body>
