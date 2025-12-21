@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=no"">
 <title>Textbooks</title>
 
 <style>
@@ -11,6 +11,15 @@ body{
     font-family: Arial, sans-serif;
     background:#f4f6f9;
     padding-top:56px;
+
+    /* Disable text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    /* Disable long press menu */
+    -webkit-touch-callout: none;
 }
 
 /* Fixed Header */
@@ -110,6 +119,15 @@ body{
 function goHome(){
     window.location.href = "textbooks.html";
 }
+    // Disable double tap zoom (mobile)
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    let now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
 
 function openPDF(link){
     window.location.href = link;
