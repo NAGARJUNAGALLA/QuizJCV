@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Maths Quiz</title>
+
+<!-- MathJax -->
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+body{margin:0;font-family:Arial;background:#f4f6fa}
+header{
+position:fixed;top:0;left:0;right:0;
+background:#1e88e5;color:#fff;
+padding:10px;text-align:center;
+z-index:10
+}
+#timer{float:left}
+#toggleNav{float:right;background:#fff;color:#1e88e5;border:none;padding:5px 10px;border-radius:6px}
+
+#container{padding:70px 10px 140px}
+
+.option{
+display:block;
+padding:10px;
+border:1px solid #ccc;
+border-radius:8px;
+margin:8px 0
+}
+.correct{background:#c8f7c5;border-color:green}
+.wrong{background:#f7c5c5;border-color:red}
+
+.bottom-bar{
+position:fixed;bottom:0;left:0;right:0;
+display:flex;justify-content:space-between;
+padding:10px;background:#fff;border-top:1px solid #ccc
+}
+button{padding:10px 15px;border:none;border-radius:6px}
+#prev{background:#ccc}
+#next{background:#1e88e5;color:#fff}
+#submit{background:green;color:#fff;display:none}
+
+#navPanel{
+position:fixed;top:60px;right:-250px;width:220px;
+background:#fff;border-left:2px solid #1e88e5;
+height:100%;padding:10px;transition:0.3s
+}
+.nav-btn{
+width:40px;height:40px;margin:5px;border:none;border-radius:50%
+}
+.attempted{background:green;color:#fff}
+.viewed{background:red;color:#fff}
+
+#resultBox{
+margin-top:20px;
+padding:15px;
+background:#fff;
+border-radius:10px;
+border:2px solid #1e88e5
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<span id="timer"></span>
+Maths Quiz
+<button id="toggleNav">☰</button>
+</header>
+
+<div id="container"></div>
+
+<div class="bottom-bar">
+<button id="prev">Prev</button>
+<button id="next">Next</button>
+<button id="submit">Submit</button>
+</div>
+
+<div id="navPanel"></div>
+
+<script>
+const questions=[
+{
+q:"Solve: $2 + 3 \\times 4$",
+o:["20","14","12","10"],
+a:1
+},
+{
+q:"If $x=5$, find $x^2 + 2x$",
+o:["35","30","25","15"],
+a:0
+},
+{
+q:"Value of $\\frac{1}{2} + \\frac{1}{4}$ is",
+o:["$\\frac{3}{4}$","$\\frac{1}{6}$","$\\frac{2}{3}$","$\\frac{1}{8}$"],
+a:0
+},
+{
+q:"Area of square with side $4$ cm",
+o:["12","16","20","8"],
+a:1
+}
+];
+
+let index=0,answers=[],viewed=[],submitted=false;
+let timeLeft=questions.length*60;
+let timerInterval;
+
+const cont=document.getElementById("container");
+const nav=document.getElementById("navPanel");
+
+function loadQuestion(){
+viewed[index]=true;
+let q=questions[index];
+
+cont.innerHTML=`
+<h3>Q${index+1}. ${q.q}</h3>
+${q.o.map((opt,i)=>`
+<label class="option ${submitted && i===q.a ? 'correct' : ''} 
+${submitted && answers[index]===i && i!==q.a ? 'wrong' : ''}">
+<input type="radio" name="opt"
+${submitted?"disabled":""}
+${answers[index]===i?"checked":""}
+onclick="answers[${index}]=${i};updateNav()">
+${opt}
+</label>`).join("")}
+`;
+
+if(submitted && index===0){
+showResultBox();
+}
+
+document.getElementById("submit").style.display=
+(index===questions.length-1 && !submitted)?"block":"none";
+
+updateNav();
+MathJax.typeset();
+}
+
+function updateNav(){
+nav.innerHTML="";
+questions.forEach((_,i)=>{
+let cls="";
+if(answers[i]!=null)cls="attempted";
+else if(viewed[i])cls="viewed";
+nav.innerHTML+=`<button class="nav-btn ${cls}"
+onclick="index=${i};loadQuestion()">${i+1}</button>`;
+});
+}
+
+document.getElementById("toggleNav").onclick=()=>{
+nav.style.right=(nav.style.right=="0px")?"-250px":"0px";
+};
+
+document.getElementById("prev").onclick=()=>{
+if(index>0){index--;loadQuestion();}
+};
+document.getElementById("next").onclick=()=>{
+if(index<questions.length-1){index++;loadQuestion();}
+};
+
+document.getElementById("submit").onclick=submitQuiz;
+
+function submitQuiz(){
+if(submitted) return;
+submitted=true;
+clearInterval(timerInterval);
+showResultBox();
+sendToGoogleForm();
+loadQuestion();
+}
+
+function showResultBox(){
+let score=0;
+questions.forEach((q,i)=>{
+if(answers[i]===q.a)score++;
+});
+cont.insertAdjacentHTML("beforeend",`
+<div id="resultBox">
+<h3>Result</h3>
+<p><b>Score:</b> ${score} / ${questions.length}</p>
+</div>
+`);
+}
+
+function timer(){
+let m=Math.floor(timeLeft/60);
+let s=timeLeft%60;
+document.getElementById("timer").innerText=
+`Time: ${m}:${s<10?"0"+s:s}`;
+if(timeLeft--<=0 && !submitted)submitQuiz();
+}
+
+timerInterval=setInterval(timer,1000);
+
+function sendToGoogleForm(){
+let formURL="https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse";
+let data=new FormData();
+data.append("entry.123456",JSON.stringify(answers));
+fetch(formURL,{method:"POST",mode:"no-cors",body:data});
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
