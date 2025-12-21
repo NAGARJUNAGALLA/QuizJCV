@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Maths Test Series</title>
+
+<style>
+body{
+    margin:0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background:#f5f6fa;
+}
+
+/* ===== HEADER ===== */
+.header{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    height:60px;
+    background:#ffffff;
+    display:flex;
+    align-items:center;
+    padding:0 15px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    z-index:1000;
+}
+
+.home-btn{
+    font-size:22px;
+    margin-right:12px;
+    cursor:pointer;
+}
+
+.header-title{
+    font-size:18px;
+    font-weight:600;
+}
+
+/* ===== CONTENT ===== */
+.container{
+    padding:80px 15px 20px;
+}
+
+/* ===== CARD ===== */
+.card{
+    background:#ffffff;
+    border-radius:16px;
+    padding:16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:15px;
+    box-shadow:0 6px 14px rgba(0,0,0,0.08);
+    cursor:pointer;
+}
+
+.left{
+    display:flex;
+    align-items:center;
+}
+
+.circle{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    border:2px solid #6c5ce7;
+    color:#6c5ce7;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:600;
+    margin-right:14px;
+}
+
+.text h3{
+    margin:0;
+    font-size:16px;
+    font-weight:600;
+}
+
+.text p{
+    margin:4px 0 0;
+    font-size:13px;
+    color:#777;
+}
+
+.arrow{
+    font-size:22px;
+    color:#bbb;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="home-btn" onclick="goHome()">🏠</div>
+    <div class="header-title">Mathematics – Test Series</div>
+</div>
+
+<!-- CONTENT -->
+<div class="container">
+
+    <div class="card" onclick="openTest('test1.html')">
+        <div class="left">
+            <div class="circle">1</div>
+            <div class="text">
+                <h3>Maths Practice Test – 1</h3>
+                <p>Number System</p>
+            </div>
+        </div>
+        <div class="arrow">›</div>
+    </div>
+
+    <div class="card" onclick="openTest('test2.html')">
+        <div class="left">
+            <div class="circle">2</div>
+            <div class="text">
+                <h3>Maths Practice Test – 2</h3>
+                <p>Algebra</p>
+            </div>
+        </div>
+        <div class="arrow">›</div>
+    </div>
+
+    <div class="card" onclick="openTest('test3.html')">
+        <div class="left">
+            <div class="circle">3</div>
+            <div class="text">
+                <h3>Maths Practice Test – 3</h3>
+                <p>Geometry</p>
+            </div>
+        </div>
+        <div class="arrow">›</div>
+    </div>
+ <div class="card" onclick="openTest('test1.html')">
+        <div class="left">
+            <div class="circle">1</div>
+            <div class="text">
+                <h3>Maths Practice Test – 1</h3>
+                <p>Number System</p>
+            </div>
+        </div>
+        <div class="arrow">›</div>
+    </div>
+
+    <div class="card" onclick="openTest('test2.html')">
+        <div class="left">
+            <div class="circle">2</div>
+            <div class="text">
+                <h3>Maths Practice Test – 2</h3>
+                <p>Algebra</p>
+            </div>
+        </div>
+        <div class="arrow">›</div>
+    </div>
+
+    <div class="card" onclick="openTest('test3.html')">
+        <div class="left">
+            <div class="circle">3</div>
+            <div class="text">
+                <h3>Maths Practice Test – 3</h3>
+                <p>Geometry</p>
+            </div>
+        </div>
+        <div class="arrow">›</div>
+    </div>
+ <div class="card" onclick="openTest('test1.html')">
+        <div class="left">
+            <div class="circle">1</div>
+            <div class="text">
+                <h3>Maths Practice Test – 1</h3>
+                <p>Number System</p>
+            </div>
+        </div>
+        <div class="arrow">›</div>
+    </div>
+
+    <div class="card" onclick="openTest('test2.html')">
+        <div class="left">
+            <div class="circle">2</div>
+            <div class="text">
+                <h3>Maths Practice Test – 2</h3>
+                <p>Algebra</p>
+            </div>
+        </div>
+        <div class="arrow">›</div>
+    </div>
+
+    <div class="card" onclick="openTest('test3.html')">
+        <div class="left">
+            <div class="circle">3</div>
+            <div class="text">
+                <h3>Maths Practice Test – 3</h3>
+                <p>Geometry</p>
+            </div>
+        </div>
+        <div class="arrow">›</div>
+    </div>
+
+</div>
+
+<script>
+function goHome(){
+    window.location.href = "index.html";
+}
+
+function openTest(link){
+    window.location.href = link;
+}
+</script>
+
+</body>
+</html>
