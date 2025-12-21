@@ -7,9 +7,7 @@
 
 <!-- MathJax -->
 <script>
-window.MathJax = {
-  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
-};
+window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]}};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
@@ -24,14 +22,12 @@ z-index:10
 #timer{float:left}
 #toggleNav{float:right;background:#fff;color:#1e88e5;border:none;padding:5px 10px;border-radius:6px}
 
-#container{padding:70px 10px 140px}
+#container{padding:70px 10px 20px}
+#resultContainer{padding:10px 10px 160px}
 
 .option{
-display:block;
-padding:10px;
-border:1px solid #ccc;
-border-radius:8px;
-margin:8px 0
+display:block;padding:10px;border:1px solid #ccc;
+border-radius:8px;margin:8px 0
 }
 .correct{background:#c8f7c5;border-color:green}
 .wrong{background:#f7c5c5;border-color:red}
@@ -57,27 +53,39 @@ width:40px;height:40px;margin:5px;border:none;border-radius:50%
 .attempted{background:green;color:#fff}
 .viewed{background:red;color:#fff}
 
+.watermark{
+position:fixed;opacity:0.15;font-size:22px;
+transform:rotate(-30deg);color:#000;
+pointer-events:none
+}
+
+#loginBox{text-align:center;padding:40px}
 #resultBox{
-margin-top:20px;
-padding:15px;
-background:#fff;
-border-radius:10px;
-border:2px solid #1e88e5
+background:#fff;border-radius:10px;
+border:2px solid #1e88e5;padding:15px
 }
 </style>
 </head>
 
 <body>
 
-<header>
+<!-- LOGIN -->
+<div id="loginBox">
+<h2>Enter Mobile Number</h2>
+<input id="mobileInput" type="tel" placeholder="Mobile Number"><br><br>
+<button onclick="login()">Start Quiz</button>
+</div>
+
+<header id="quizHeader" style="display:none">
 <span id="timer"></span>
 Maths Quiz
 <button id="toggleNav">☰</button>
 </header>
 
 <div id="container"></div>
+<div id="resultContainer"></div>
 
-<div class="bottom-bar">
+<div class="bottom-bar" id="bottomBar" style="display:none">
 <button id="prev">Prev</button>
 <button id="next">Next</button>
 <button id="submit">Submit</button>
@@ -85,46 +93,48 @@ Maths Quiz
 
 <div id="navPanel"></div>
 
+<div class="watermark" style="top:40%;left:20%" id="wm1"></div>
+<div class="watermark" style="top:60%;left:50%" id="wm2"></div>
+
 <script>
+const allowedMobiles=["6301186741","9876543210"];
+let mobile="";
+
 const questions=[
-{
-q:"Solve: $2 + 3 \\times 4$",
-o:["20","14","12","10"],
-a:1
-},
-{
-q:"If $x=5$, find $x^2 + 2x$",
-o:["35","30","25","15"],
-a:0
-},
-{
-q:"Value of $\\frac{1}{2} + \\frac{1}{4}$ is",
-o:["$\\frac{3}{4}$","$\\frac{1}{6}$","$\\frac{2}{3}$","$\\frac{1}{8}$"],
-a:0
-},
-{
-q:"Area of square with side $4$ cm",
-o:["12","16","20","8"],
-a:1
-}
+{q:"Solve: $2 + 3 \\times 4$",o:["20","14","12","10"],a:1},
+{q:"If $x=5$, find $x^2 + 2x$",o:["35","30","25","15"],a:0},
+{q:"$\\frac{1}{2}+\\frac{1}{4}=$ ?",o:["$\\frac{3}{4}$","$\\frac{2}{3}$","$\\frac{1}{6}$","$\\frac{1}{8}$"],a:0}
 ];
 
 let index=0,answers=[],viewed=[],submitted=false;
 let timeLeft=questions.length*60;
 let timerInterval;
 
-const cont=document.getElementById("container");
-const nav=document.getElementById("navPanel");
+function login(){
+mobile=mobileInput.value;
+if(!allowedMobiles.includes(mobile)){
+alert("Invalid Mobile Number");
+return;
+}
+loginBox.style.display="none";
+quizHeader.style.display="block";
+bottomBar.style.display="flex";
+wm1.innerText=mobile;
+wm2.innerText=mobile;
+loadQuestion();
+timerInterval=setInterval(timer,1000);
+}
 
 function loadQuestion(){
 viewed[index]=true;
 let q=questions[index];
-
-cont.innerHTML=`
+container.innerHTML=`
+<h4>Mobile: ${mobile}</h4>
 <h3>Q${index+1}. ${q.q}</h3>
 ${q.o.map((opt,i)=>`
-<label class="option ${submitted && i===q.a ? 'correct' : ''} 
-${submitted && answers[index]===i && i!==q.a ? 'wrong' : ''}">
+<label class="option
+${submitted&&i===q.a?'correct':''}
+${submitted&&answers[index]===i&&i!==q.a?'wrong':''}">
 <input type="radio" name="opt"
 ${submitted?"disabled":""}
 ${answers[index]===i?"checked":""}
@@ -132,83 +142,61 @@ onclick="answers[${index}]=${i};updateNav()">
 ${opt}
 </label>`).join("")}
 `;
-
-if(submitted && index===0){
-showResultBox();
-}
-
-document.getElementById("submit").style.display=
-(index===questions.length-1 && !submitted)?"block":"none";
-
+submit.style.display=(index===questions.length-1&&!submitted)?"block":"none";
 updateNav();
 MathJax.typeset();
 }
 
 function updateNav(){
-nav.innerHTML="";
+navPanel.innerHTML="";
 questions.forEach((_,i)=>{
 let cls="";
 if(answers[i]!=null)cls="attempted";
 else if(viewed[i])cls="viewed";
-nav.innerHTML+=`<button class="nav-btn ${cls}"
-onclick="index=${i};loadQuestion()">${i+1}</button>`;
+navPanel.innerHTML+=`<button class="nav-btn ${cls}" onclick="index=${i};loadQuestion()">${i+1}</button>`;
 });
 }
 
-document.getElementById("toggleNav").onclick=()=>{
-nav.style.right=(nav.style.right=="0px")?"-250px":"0px";
-};
-
-document.getElementById("prev").onclick=()=>{
-if(index>0){index--;loadQuestion();}
-};
-document.getElementById("next").onclick=()=>{
-if(index<questions.length-1){index++;loadQuestion();}
-};
-
-document.getElementById("submit").onclick=submitQuiz;
+toggleNav.onclick=()=>navPanel.style.right=navPanel.style.right=="0px"?"-250px":"0px";
+prev.onclick=()=>{if(index>0){index--;loadQuestion();}};
+next.onclick=()=>{if(index<questions.length-1){index++;loadQuestion();}};
+submit.onclick=submitQuiz;
 
 function submitQuiz(){
-if(submitted) return;
+if(submitted)return;
 submitted=true;
 clearInterval(timerInterval);
-showResultBox();
-sendToGoogleForm();
-loadQuestion();
-}
 
-function showResultBox(){
 let score=0;
-questions.forEach((q,i)=>{
-if(answers[i]===q.a)score++;
-});
-cont.insertAdjacentHTML("beforeend",`
+questions.forEach((q,i)=>{if(answers[i]===q.a)score++;});
+
+resultContainer.innerHTML=`
 <div id="resultBox">
 <h3>Result</h3>
-<p><b>Score:</b> ${score} / ${questions.length}</p>
+<p><b>Mobile Number :</b> ${mobile}</p>
+<p><b>Marks :</b> ${score} / ${questions.length}</p>
 </div>
-`);
+`;
+
+sendToGoogleForm(score);
+loadQuestion();
 }
 
 function timer(){
-let m=Math.floor(timeLeft/60);
-let s=timeLeft%60;
-document.getElementById("timer").innerText=
-`Time: ${m}:${s<10?"0"+s:s}`;
+let m=Math.floor(timeLeft/60),s=timeLeft%60;
+timer.innerText=`Time: ${m}:${s<10?'0'+s:s}`;
 if(timeLeft--<=0 && !submitted)submitQuiz();
 }
 
-timerInterval=setInterval(timer,1000);
-
-function sendToGoogleForm(){
-let formURL="https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse";
+function sendToGoogleForm(score){
+let url="https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse";
 let data=new FormData();
-data.append("entry.123456",JSON.stringify(answers));
-fetch(formURL,{method:"POST",mode:"no-cors",body:data});
+data.append("entry.MOBILE_ENTRY_ID",mobile);
+data.append("entry.MARKS_ENTRY_ID",score);
+fetch(url,{method:"POST",mode:"no-cors",body:data});
 }
-
-loadQuestion();
 </script>
 
 </body>
 </html>
+
