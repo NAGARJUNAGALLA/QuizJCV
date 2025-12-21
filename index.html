@@ -145,29 +145,31 @@ body{
 <div class="container">
 
     <!-- Free Courses -->
-    <div id="free">
-        <div class="grid">
-            <div class="card" onclick="openPage('study_material.html')">
-                <h3>Study Material</h3>
-                <p class="free">FREE</p>
-            </div>
+    <div id="paid" style="display:none;">
+    <div class="paid-list">
 
-            <div class="card" onclick="openPage('textbooks.html')">
-                <h3>Textbooks</h3>
-                <p class="free">FREE</p>
-            </div>
-
-            <div class="card" onclick="openPage('free_tests.html')">
-                <h3>Free Tests</h3>
-                <p class="free">FREE</p>
-            </div>
-            <div class="paid-card blue" onclick="openPage('quiz_list_1.html')">
-            <h3>IIT Foundation – Physics</h3>
+        <div class="paid-card blue" onclick="openPage('quiz_list_1.html')">
+            <h3>Text Books</h3>
             <p>Number of Tests: 15</p>
             <p class="cost">Cost: ₹0</p>
         </div>
+
+        <div class="paid-card green" onclick="openPage('quiz_list_2.html')">
+            <h3>Study Material</h3>
+            <p>Number of Tests: 12</p>
+            <p class="cost">Cost: ₹0</p>
         </div>
+
+        <div class="paid-card orange" onclick="openPage('quiz_list_3.html')">
+            <h3>Free Tests</h3>
+            <p>Number of Tests: 18</p>
+            <p class="cost">Cost: ₹0</p>
+        </div>
+
+        
+
     </div>
+</div>
 
 <!-- Paid Courses -->
 <div id="paid" style="display:none;">
