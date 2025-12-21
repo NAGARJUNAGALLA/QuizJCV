@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Textbooks</title>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    padding-top:56px;
+}
+
+/* Fixed Header */
+.header{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:56px;
+    background:#0d6efd;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    font-weight:bold;
+    z-index:1000;
+}
+
+/* Home Button */
+.home-btn{
+    position:absolute;
+    left:15px;
+    font-size:20px;
+    cursor:pointer;
+}
+
+/* Container */
+.container{
+    padding:15px;
+}
+
+/* Folder Card */
+.folder{
+    background:#fff;
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    font-size:16px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    cursor:pointer;
+}
+
+.folder span{
+    font-size:22px;
+    margin-right:12px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="home-btn" onclick="goHome()">🏠</div>
+   JCV ICE - TELUGU Textbooks
+</div>
+
+<div class="container">
+
+    <div class="folder" onclick="openPDF('https://drive.google.com/file/d/DRIVE_TELUGU_PDF/view')">
+        <span>📚</span> III CLASS TELUGU
+    </div>
+
+    <div class="folder" onclick="openPDF('https://drive.google.com/file/d/DRIVE_ENGLISH_PDF/view')">
+        <span>📚</span> IV CLASS TELUGU
+    </div>
+
+    <div class="folder" onclick="openPDF('https://drive.google.com/file/d/DRIVE_MATHS_PDF/view')">
+        <span>📚</span></span> V CLASS TELUGU
+    </div>
+
+    <div class="folder" onclick="openPDF('https://drive.google.com/file/d/DRIVE_SCIENCE_PDF/view')">
+        <span>📚</span> VI CLASS TELUGU
+    </div>
+
+    <div class="folder" onclick="openPDF('https://drive.google.com/file/d/DRIVE_SOCIAL_PDF/view')">
+        <span>📚</span> VII CLASS TELUGU
+    </div>
+
+    <div class="folder" onclick="openPDF('https://drive.google.com/file/d/DRIVE_METHODS_PDF/view')">
+        <span>📚</span> VIII CLASS TELUGU
+    </div>
+    <div class="folder" onclick="openPDF('https://drive.google.com/file/d/DRIVE_METHODS_PDF/view')">
+        <span>📚</span> IX CLASS TELUGU
+    </div>
+  <div class="folder" onclick="openPDF('https://drive.google.com/file/d/DRIVE_METHODS_PDF/view')">
+        <span>📚</span> X CLASS TELUGU
+    </div>
+
+</div>
+
+<script>
+function goHome(){
+    window.location.href = "textbooks.html";
+}
+
+function openPDF(link){
+    window.location.href = link;
+}
+</script>
+
+</body>
+</html>
+
