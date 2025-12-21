@@ -2,187 +2,159 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
-<title>Quiz Subjects</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Courses Dashboard</title>
 
 <style>
 body{
-    font-family: Arial, sans-serif;
-    background:#f2f2f2;
     margin:0;
-    padding:15px;
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
 }
 
-.subject-card{
-    background:#fff;
-    border-radius:15px;
-    margin-bottom:18px;
-    box-shadow:0 4px 8px rgba(0,0,0,0.15);
-    overflow:hidden;
-}
-
+/* Header */
 .header{
+    background:#0d6efd;
     color:#fff;
+    padding:15px;
     text-align:center;
-    padding:12px;
-    font-size:18px;
+    font-size:20px;
     font-weight:bold;
 }
 
-.purple{background:#8e24aa;}
-.green{background:#00897b;}
-.orange{background:#f4511e;}
-.blue{background:#3f51b5;}
+/* Tabs */
+.tabs{
+    display:flex;
+    background:#fff;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+.tab{
+    flex:1;
+    padding:12px;
+    text-align:center;
+    cursor:pointer;
+    font-weight:bold;
+}
+.tab.active{
+    color:#0d6efd;
+    border-bottom:3px solid #0d6efd;
+}
 
-.content{
+/* Course Grid */
+.container{
     padding:15px;
 }
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
 
-.block{
-    display:flex;
-    align-items:center;
-    background:#eef1f6;
-    padding:12px;
-    margin-bottom:10px;
-    border-radius:10px;
-    text-decoration:none;
-    color:#000;
+/* Card */
+.card{
+    background:#fff;
+    border-radius:12px;
+    padding:15px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    cursor:pointer;
+}
+.card h3{
+    margin:0 0 8px;
     font-size:16px;
-    font-weight:600;
+}
+.card p{
+    margin:0;
+    font-size:13px;
+    color:#666;
+}
+.free{
+    color:green;
+    font-weight:bold;
+}
+.paid{
+    color:#d63384;
+    font-weight:bold;
 }
 
-.block:last-child{
-    margin-bottom:0;
+.lock{
+    float:right;
+    font-size:16px;
 }
-
-.icon{
-    width:36px;
-    height:36px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#fff;
-    font-size:18px;
-    margin-right:12px;
-}
-
-.icon.purple{background:#8e24aa;}
-.icon.green{background:#00897b;}
-.icon.orange{background:#f4511e;}
-.icon.blue{background:#3f51b5;}
 </style>
 </head>
 
 <body>
 
-<!-- MATHEMATICS -->
-<div class="subject-card">
-    <div class="header purple">MATHEMATICS</div>
-    <div class="content">
-        <a class="block" href="maths_test1.html">
-            <div class="icon purple">✓</div>
-            Real Numbers
-        </a>
-        <a class="block" href="maths_test2.html">
-            <div class="icon purple">✓</div>
-            Polynamials
-        </a>
-        <a class="block" href="maths_test2.html">
-            <div class="icon purple">✓</div>
-           Coordinate Geometry
-        </a>
-        <a class="block" href="maths_test1.html">
-            <div class="icon purple">✓</div>
-            Linear Equations in Two Variables
-        </a>
-        <a class="block" href="maths_test2.html">
-            <div class="icon purple">✓</div>
-            Quadratic Equations
-        </a>
-        <a class="block" href="maths_test2.html">
-            <div class="icon purple">✓</div>
-           Arithmetic Progression
-        </a>
-        <a class="block" href="maths_test1.html">
-            <div class="icon purple">✓</div>
-            Coordinate Geometry
-        </a>
-        <a class="block" href="maths_test2.html">
-            <div class="icon purple">✓</div>
-            Triangles
-        </a>
-        <a class="block" href="maths_test2.html">
-            <div class="icon purple">✓</div>
-           Circles
-        </a>
-        <a class="block" href="maths_test1.html">
-            <div class="icon purple">✓</div>
-            Areas Related to Circles
-        </a>
-        <a class="block" href="maths_test2.html">
-            <div class="icon purple">✓</div>
-            Trignometry
-        </a>
-<a class="block" href="maths_test2.html">
-            <div class="icon purple">✓</div>
-            Applications of Trignometry 
-        </a>
-        <a class="block" href="maths_test1.html">
-            <div class="icon purple">✓</div>
-            Surface Areas and Volumes
-        </a>
-        <a class="block" href="maths_test2.html">
-            <div class="icon purple">✓</div>
-            Statistics
-        </a>
-    </div>
+<div class="header">JCV ICE</div>
+
+<div class="tabs">
+    <div class="tab active" onclick="showCourses('free')">Free Courses</div>
+    <div class="tab" onclick="showCourses('paid')">Paid Courses</div>
 </div>
 
-<!-- PHYSICS -->
-<div class="subject-card">
-    <div class="header green">PHYSICS QUIZZES</div>
-    <div class="content">
-        <a class="block" href="physics_test1.html">
-            <div class="icon green">✓</div>
-            Motion Quiz
-        </a>
-        <a class="block" href="physics_test2.html">
-            <div class="icon green">✓</div>
-            Light Quiz
-        </a>
+<div class="container">
+
+    <!-- Free Courses -->
+    <div id="free" class="grid">
+        <div class="card" onclick="openCourse('study_material.html')">
+            <h3>Study Material</h3>
+            <p class="free">FREE</p>
+        </div>
+
+        <div class="card" onclick="openCourse('textbooks.html')">
+            <h3>Textbooks</h3>
+            <p class="free">FREE</p>
+        </div>
+
+        <div class="card" onclick="openCourse('free_tests.html')">
+            <h3>Free Tests</h3>
+            <p class="free">FREE</p>
+        </div>
     </div>
+
+    <!-- Paid Courses -->
+    <div id="paid" class="grid" style="display:none;">
+        <div class="card" onclick="openCourse('quiz_list_1.html')">
+            <span class="lock">🔒</span>
+            <h3>Maths Test Series</h3>
+            <p class="paid">PAID</p>
+        </div>
+
+        <div class="card" onclick="openCourse('quiz_list_2.html')">
+            <span class="lock">🔒</span>
+            <h3>Telugu Test Series</h3>
+            <p class="paid">PAID</p>
+        </div>
+
+        <div class="card" onclick="openCourse('quiz_list_3.html')">
+            <span class="lock">🔒</span>
+            <h3>English Test Series</h3>
+            <p class="paid">PAID</p>
+        </div>
+
+        <div class="card" onclick="openCourse('quiz_list_4.html')">
+            <span class="lock">🔒</span>
+            <h3>AP DSC SGT TEST SERIES</h3>
+            <p class="paid">PAID</p>
+        </div>
+    </div>
+
 </div>
 
-<!-- CHEMISTRY -->
-<div class="subject-card">
-    <div class="header orange">CHEMISTRY QUIZZES</div>
-    <div class="content">
-        <a class="block" href="chem_test1.html">
-            <div class="icon orange">✓</div>
-            Atoms Quiz
-        </a>
-        <a class="block" href="chem_test2.html">
-            <div class="icon orange">✓</div>
-            Acids & Bases Quiz
-        </a>
-    </div>
-</div>
+<script>
+function showCourses(type){
+    document.getElementById('free').style.display = type === 'free' ? 'grid' : 'none';
+    document.getElementById('paid').style.display = type === 'paid' ? 'grid' : 'none';
 
-<!-- BIOLOGY -->
-<div class="subject-card">
-    <div class="header blue">BIOLOGY QUIZZES</div>
-    <div class="content">
-        <a class="block" href="bio_test1.html">
-            <div class="icon blue">✓</div>
-            Cell Quiz
-        </a>
-        <a class="block" href="bio_test2.html">
-            <div class="icon blue">✓</div>
-            Human Body Quiz
-        </a>
-    </div>
-</div>
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function openCourse(page){
+    window.location.href = page; 
+}
+</script>
 
 </body>
 </html>
+
