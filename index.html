@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Courses Dashboard</title>
+<title>Courses App</title>
 
 <style>
 body{
     margin:0;
     font-family: Arial, sans-serif;
     background:#f4f6f9;
+    padding-bottom:60px; /* space for bottom nav */
 }
 
 /* Header */
@@ -22,25 +23,7 @@ body{
     font-weight:bold;
 }
 
-/* Tabs */
-.tabs{
-    display:flex;
-    background:#fff;
-    box-shadow:0 2px 5px rgba(0,0,0,0.1);
-}
-.tab{
-    flex:1;
-    padding:12px;
-    text-align:center;
-    cursor:pointer;
-    font-weight:bold;
-}
-.tab.active{
-    color:#0d6efd;
-    border-bottom:3px solid #0d6efd;
-}
-
-/* Course Grid */
+/* Content */
 .container{
     padding:15px;
 }
@@ -50,7 +33,7 @@ body{
     gap:15px;
 }
 
-/* Card */
+/* Cards */
 .card{
     background:#fff;
     border-radius:12px;
@@ -65,7 +48,6 @@ body{
 .card p{
     margin:0;
     font-size:13px;
-    color:#666;
 }
 .free{
     color:green;
@@ -75,83 +57,166 @@ body{
     color:#d63384;
     font-weight:bold;
 }
-
 .lock{
     float:right;
+}
+
+/* Bottom Navigation */
+.bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:55px;
+    background:#ffffff;
+    display:flex;
+    box-shadow:0 -2px 5px rgba(0,0,0,0.15);
+}
+.nav-btn{
+    flex:1;
+    text-align:center;
+    padding-top:8px;
+    font-size:14px;
+    font-weight:bold;
+    cursor:pointer;
+    color:#666;
+}
+.nav-btn.active{
+    color:#0d6efd;
+}
+/* Paid Course List */
+.paid-list{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+/* Paid Card */
+.paid-card{
+    border-radius:14px;
+    padding:18px;
+    color:#fff;
+    box-shadow:0 6px 14px rgba(0,0,0,0.15);
+    cursor:pointer;
+}
+
+.paid-card h3{
+    margin:0 0 8px;
+    font-size:18px;
+}
+
+.paid-card p{
+    margin:4px 0;
+    font-size:14px;
+}
+
+/* Cost */
+.cost{
+    color:red;
+    font-weight:bold;
     font-size:16px;
 }
+
+/* Different Colours */
+.blue{ background:#0d6efd; }
+.green{ background:#198754; }
+.orange{ background:#fd7e14; }
+.purple{ background:#6f42c1; }
+/* Cost */
+.cost{
+    background:#ffffff;
+    color:red;
+    font-weight:bold;
+    font-size:16px;
+    padding:6px 10px;
+    border-radius:8px;
+    display:inline-block;
+    margin-top:8px;
+}
+
+
 </style>
 </head>
 
 <body>
 
-<div class="header">JCV ICE</div>
-
-<div class="tabs">
-    <div class="tab active" onclick="showCourses('free')">Free Courses</div>
-    <div class="tab" onclick="showCourses('paid')">Paid Courses</div>
-</div>
+<div class="header">JCV ICE</div></div>
 
 <div class="container">
 
     <!-- Free Courses -->
-    <div id="free" class="grid">
-        <div class="card" onclick="openCourse('study_material.html')">
-            <h3>Study Material</h3>
-            <p class="free">FREE</p>
-        </div>
+    <div id="free">
+        <div class="grid">
+            <div class="card" onclick="openPage('study_material.html')">
+                <h3>Study Material</h3>
+                <p class="free">FREE</p>
+            </div>
 
-        <div class="card" onclick="openCourse('textbooks.html')">
-            <h3>Textbooks</h3>
-            <p class="free">FREE</p>
-        </div>
+            <div class="card" onclick="openPage('textbooks.html')">
+                <h3>Textbooks</h3>
+                <p class="free">FREE</p>
+            </div>
 
-        <div class="card" onclick="openCourse('free_tests.html')">
-            <h3>Free Tests</h3>
-            <p class="free">FREE</p>
-        </div>
-    </div>
-
-    <!-- Paid Courses -->
-    <div id="paid" class="grid" style="display:none;">
-        <div class="card" onclick="openCourse('quiz_list_1.html')">
-            <span class="lock">🔒</span>
-            <h3>Maths Test Series</h3>
-            <p class="paid">PAID</p>
-        </div>
-
-        <div class="card" onclick="openCourse('quiz_list_2.html')">
-            <span class="lock">🔒</span>
-            <h3>Telugu Test Series</h3>
-            <p class="paid">PAID</p>
-        </div>
-
-        <div class="card" onclick="openCourse('quiz_list_3.html')">
-            <span class="lock">🔒</span>
-            <h3>English Test Series</h3>
-            <p class="paid">PAID</p>
-        </div>
-
-        <div class="card" onclick="openCourse('quiz_list_4.html')">
-            <span class="lock">🔒</span>
-            <h3>AP DSC SGT TEST SERIES</h3>
-            <p class="paid">PAID</p>
+            <div class="card" onclick="openPage('free_tests.html')">
+                <h3>Free Tests</h3>
+                <p class="free">FREE</p>
+            </div>
         </div>
     </div>
 
+<!-- Paid Courses -->
+<div id="paid" style="display:none;">
+    <div class="paid-list">
+
+        <div class="paid-card blue" onclick="openPage('quiz_list_1.html')">
+            <h3>IIT Foundation – Physics</h3>
+            <p>Number of Tests: 15</p>
+            <p class="cost">Cost: ₹999</p>
+        </div>
+
+        <div class="paid-card green" onclick="openPage('quiz_list_2.html')">
+            <h3>IIT Foundation – Chemistry</h3>
+            <p>Number of Tests: 12</p>
+            <p class="cost">Cost: ₹899</p>
+        </div>
+
+        <div class="paid-card orange" onclick="openPage('quiz_list_3.html')">
+            <h3>NEET Foundation – Biology</h3>
+            <p>Number of Tests: 18</p>
+            <p class="cost">Cost: ₹1,199</p>
+        </div>
+
+        <div class="paid-card purple" onclick="openPage('quiz_list_4.html')">
+            <h3>Olympiad – Maths</h3>
+            <p>Number of Tests: 10</p>
+            <p class="cost">Cost: ₹799</p>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <div class="nav-btn active" onclick="showTab('free', this)">
+        🆓 Free Courses
+    </div>
+    <div class="nav-btn" onclick="showTab('paid', this)">
+        🔒 Paid Courses
+    </div>
 </div>
 
 <script>
-function showCourses(type){
-    document.getElementById('free').style.display = type === 'free' ? 'grid' : 'none';
-    document.getElementById('paid').style.display = type === 'paid' ? 'grid' : 'none';
+function showTab(tab, el){
+    document.getElementById('free').style.display = tab === 'free' ? 'block' : 'none';
+    document.getElementById('paid').style.display = tab === 'paid' ? 'block' : 'none';
 
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    el.classList.add('active');
 }
 
-function openCourse(page){
-    window.location.href = page; 
+function openPage(page){
+    window.location.href = page;
 }
 </script>
 
