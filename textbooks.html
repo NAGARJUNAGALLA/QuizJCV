@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Textbooks</title>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    padding-top:56px; /* header height */
+}
+
+/* Fixed Header */
+.header{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:56px;
+    background:#0d6efd;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    font-weight:bold;
+    z-index:1000;
+}
+
+/* Home Button */
+.home-btn{
+    position:absolute;
+    left:15px;
+    font-size:20px;
+    cursor:pointer;
+}
+
+/* Container */
+.container{
+    padding:15px;
+}
+
+/* Folder Card */
+.folder{
+    background:#fff;
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    font-size:16px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    cursor:pointer;
+}
+
+.folder span{
+    font-size:22px;
+    margin-right:12px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Fixed Header -->
+<div class="header">
+    <div class="home-btn" onclick="goHome()">🏠</div>
+    Textbooks
+</div>
+
+<div class="container">
+
+    <div class="folder" onclick="openFolder('telugu.html')">
+        <span>📂</span> Telugu
+    </div>
+
+    <div class="folder" onclick="openFolder('english.html')">
+        <span>📂</span> English
+    </div>
+
+    <div class="folder" onclick="openFolder('maths.html')">
+        <span>📂</span> Maths
+    </div>
+
+    <div class="folder" onclick="openFolder('science.html')">
+        <span>📂</span> Science
+    </div>
+
+    <div class="folder" onclick="openFolder('social.html')">
+        <span>📂</span> Social
+    </div>
+
+    <div class="folder" onclick="openFolder('methods.html')">
+        <span>📂</span> Methods
+    </div>
+
+</div>
+
+<script>
+function goHome(){
+    window.location.href = "index.html";
+}
+
+function openFolder(page){
+    window.location.href = page;
+}
+</script>
+
+</body>
+</html>
