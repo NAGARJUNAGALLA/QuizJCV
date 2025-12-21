@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Courses App</title>
 
 <style>
@@ -12,6 +12,14 @@ body{
     background:#f4f6f9;
     padding-top:56px;     /* exactly header height */
     padding-bottom:56px;
+    /* Disable text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    /* Disable long press menu */
+    -webkit-touch-callout: none;
 }
 
 /* Header */
@@ -153,7 +161,7 @@ body{
 <div id="paid" >
     <div class="paid-list">
 
-        <div class="paid-card blue" onclick="openPage('quiz_list_1.html')">
+        <div class="paid-card blue" onclick="openPage('apdsc.html')">
             <h3>AP DSC 2026</h3>
             <p>Number of Tests: 120</p>
             <p class="cost">Cost: ₹499</p>
@@ -161,42 +169,42 @@ body{
 
         <div class="paid-card green" onclick="openPage('mathquiz.html')">
             <h3>AP DSC SGT MATHS TEST SERIES</h3>
-            <p>Number of Tests: 45 Practice Tests + 10 Model Tests</p>
+            <p>45 Practice Tests + 10 Model Tests</p>
             <p class="cost">Cost: ₹149</p>
         </div>
 
-        <div class="paid-card orange" onclick="openPage('quiz_list_3.html')">
-            <h3>NEET Foundation – Biology</h3>
-            <p>Number of Tests: 18</p>
+        <div class="paid-card orange" onclick="openPage('sciencequiz.html')">
+            <h3>AP DSC SGT SCIENCE TEST SERIES</h3>
+            <p> 45 Practice Tests + 10 Model Tests</p>
             <p class="cost">Cost: ₹1,199</p>
         </div>
 
-        <div class="paid-card purple" onclick="openPage('quiz_list_4.html')">
-            <h3>Olympiad – Maths</h3>
-            <p>Number of Tests: 10</p>
+        <div class="paid-card purple" onclick="openPage('englishquiz.html')">
+            <h3>AP DSC ENGLISH TEST SERIES</h3>
+            <p>45 Practice Tests + 10 Model Tests</p>
             <p class="cost">Cost: ₹799</p>
         </div>
-        <div class="paid-card blue" onclick="openPage('quiz_list_1.html')">
-            <h3>IIT Foundation – Physics</h3>
-            <p>Number of Tests: 15</p>
+        <div class="paid-card blue" onclick="openPage('socialquiz.html')">
+            <h3> AP DSC SGT SOCIAL TEST SERIES </h3>
+            <p>45 Practice Tests + 10 Model Tests </p>
             <p class="cost">Cost: ₹999</p>
         </div>
 
-        <div class="paid-card green" onclick="openPage('quiz_list_2.html')">
-            <h3>IIT Foundation – Chemistry</h3>
-            <p>Number of Tests: 12</p>
+        <div class="paid-card green" onclick="openPage('teluguquiz.html')">
+            <h3>AP DSC SGT TELUGU TEST SERIES</h3>
+            <p> 45 Practice Tests + 10 Model Tests </p>
             <p class="cost">Cost: ₹899</p>
         </div>
 
-        <div class="paid-card orange" onclick="openPage('quiz_list_3.html')">
-            <h3>NEET Foundation – Biology</h3>
-            <p>Number of Tests: 18</p>
+        <div class="paid-card orange" onclick="openPage('methodsquiz.html')">
+            <h3> AP DSC SGT METHODS TEST SERIES </h3>
+            <p>45 Practice Tests + 10 Model Tests </p>
             <p class="cost">Cost: ₹1,199</p>
         </div>
 
-        <div class="paid-card purple" onclick="openPage('quiz_list_4.html')">
-            <h3>Olympiad – Maths</h3>
-            <p>Number of Tests: 10</p>
+        <div class="paid-card purple" onclick="openPage('piequiz.html')">
+            <h3>AP DSC SGT PIE TEST SERIES </h3>
+            <p> 45 Practice Tests + 10 Model Tests </p>
             <p class="cost">Cost: ₹799</p>
         </div>
 
@@ -248,6 +256,15 @@ function showTab(tab, el){
 function openPage(page){
     window.location.href = page;
 }
+    // Disable double tap zoom (mobile)
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    let now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
 </script>
 
 </body>
