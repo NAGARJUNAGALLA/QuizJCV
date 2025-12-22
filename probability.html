@@ -19,7 +19,7 @@ background:#1e88e5;color:#fff;
 padding:10px;text-align:center;
 z-index:10
 }
-#timer{float:left}
+#timerText{float:left}
 #toggleNav{float:right;background:#fff;color:#1e88e5;border:none;padding:5px 10px;border-radius:6px}
 
 #container{padding:70px 10px 20px}
@@ -77,7 +77,7 @@ border:2px solid #1e88e5;padding:15px
 </div>
 
 <header id="quizHeader" style="display:none">
-<span id="timer"></span>
+<span id="timerText"></span>
 Maths Quiz
 <button id="toggleNav">☰</button>
 </header>
@@ -122,7 +122,19 @@ bottomBar.style.display="flex";
 wm1.innerText=mobile;
 wm2.innerText=mobile;
 loadQuestion();
-timerInterval=setInterval(timer,1000);
+startTimer();
+}
+
+function startTimer(){
+timerInterval=setInterval(updateTimer,1000);
+}
+
+function updateTimer(){
+let m=Math.floor(timeLeft/60);
+let s=timeLeft%60;
+document.getElementById("timerText").innerText=
+`Time: ${m}:${s<10?'0'+s:s}`;
+if(timeLeft--<=0 && !submitted)submitQuiz();
 }
 
 function loadQuestion(){
@@ -180,12 +192,6 @@ resultContainer.innerHTML=`
 
 sendToGoogleForm(score);
 loadQuestion();
-}
-
-function timer(){
-let m=Math.floor(timeLeft/60),s=timeLeft%60;
-timer.innerText=`Time: ${m}:${s<10?'0'+s:s}`;
-if(timeLeft--<=0 && !submitted)submitQuiz();
 }
 
 function sendToGoogleForm(score){
