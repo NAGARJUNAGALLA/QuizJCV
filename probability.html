@@ -60,6 +60,12 @@ pointer-events:none
 }
 
 #loginBox{text-align:center;padding:40px}
+#errorMsg{
+color:red;
+margin-top:10px;
+font-size:14px;
+display:none
+}
 #resultBox{
 background:#fff;border-radius:10px;
 border:2px solid #1e88e5;padding:15px
@@ -74,6 +80,7 @@ border:2px solid #1e88e5;padding:15px
 <h2>Enter Mobile Number</h2>
 <input id="mobileInput" type="tel" placeholder="Mobile Number"><br><br>
 <button onclick="login()">Start Quiz</button>
+<div id="errorMsg">Invalid mobile number</div>
 </div>
 
 <header id="quizHeader" style="display:none">
@@ -111,11 +118,14 @@ let timeLeft=questions.length*60;
 let timerInterval;
 
 function login(){
-mobile=mobileInput.value;
+mobile=mobileInput.value.trim();
+
 if(!allowedMobiles.includes(mobile)){
-alert("Invalid Mobile Number");
+errorMsg.style.display="block";
 return;
 }
+
+errorMsg.style.display="none";
 loginBox.style.display="none";
 quizHeader.style.display="block";
 bottomBar.style.display="flex";
@@ -132,8 +142,7 @@ timerInterval=setInterval(updateTimer,1000);
 function updateTimer(){
 let m=Math.floor(timeLeft/60);
 let s=timeLeft%60;
-document.getElementById("timerText").innerText=
-`Time: ${m}:${s<10?'0'+s:s}`;
+timerText.innerText=`Time: ${m}:${s<10?'0'+s:s}`;
 if(timeLeft--<=0 && !submitted)submitQuiz();
 }
 
